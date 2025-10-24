@@ -14,6 +14,11 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+        
         :root {
             --primary-color: #39ff14;
             --primary-text: #39ff14;
@@ -24,6 +29,7 @@
             --text-primary: #ffffff;
             --text-secondary: #e0e0e0;
             --text-muted: #808080;
+            --bottom-fixed-height: 0px;
         }
         
         [data-theme="light"] {
@@ -41,8 +47,8 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 50%, var(--bg-dark) 100%);
             color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100%;
+            overflow: hidden;
             transition: background 0.3s ease, color 0.3s ease;
         }
         
@@ -302,50 +308,58 @@
         /* Main Content */
         .main-content {
             margin-top: 60px;
-            min-height: calc(100vh - 60px);
             display: flex;
             flex-direction: column;
+            height: calc(100vh - 60px);
+            overflow: hidden !important;
         }
         
         .content-section {
             display: none;
             flex-direction: column;
+            flex: 1;
         }
         
         .content-section.active {
             display: flex;
-        }
-        
-        /* Sección Inicio - Layout especial con grid */
-        /* Sección Inicio - Layout especial con grid */
-        #seccionInicio {
-            padding: 16px;
             overflow: hidden;
         }
         
-        #seccionInicio.active {
-            display: grid !important;
-            grid-template-rows: auto 1fr auto;
-            gap: 16px;
-            height: calc(100vh - 60px);
+        /* Sección Inicio - Contenedor principal que actúa como header + content */
+        #seccionInicio {
+            flex: 1;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden !important;
+            overflow-y: hidden !important;
+            overflow-x: hidden !important;
+            gap: 0;
         }
         
+        /* Botones de acción - Header (NO scrollea NUNCA) */
         .action-buttons-top {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
+            padding: 16px;
+            flex-shrink: 0;
+            height: auto;
+            overflow: visible;
         }
         
+        /* Contenedor de scroll - El ÚNICO que scrollea */
         .items-scroll-container {
-            overflow-y: scroll;
-            padding-bottom: 250px;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             background: transparent;
             border: none;
             border-radius: 12px;
             -webkit-overflow-scrolling: touch;
-            min-height: 200px;
             flex: 1;
+            min-height: 0;
             scrollbar-gutter: stable;
+            padding: 0 16px;
+            padding-bottom: calc(16px + var(--bottom-fixed-height));
         }
         
         /* Ocultar scrollbar */
@@ -359,13 +373,21 @@
             scrollbar-width: none;
         }
         
-        /* Otras secciones - Layout normal sin grid */
+        /* Otras secciones */
         #seccionListas,
         #seccionGraficos,
         #seccionConfiguracion {
             padding: 16px;
-            overflow-y: scroll;
             scrollbar-gutter: stable;
+            flex: 1;
+        }
+        
+        /* Override: Permitir scroll en estas secciones cuando están activas */
+        #seccionListas.active,
+        #seccionGraficos.active,
+        #seccionConfiguracion.active {
+            overflow-y: scroll !important;
+            padding-bottom: calc(16px + var(--bottom-fixed-height));
         }
         
         /* Ocultar scrollbar en secciones */
@@ -383,16 +405,8 @@
             scrollbar-width: none;
         }
         
-        #seccionListas.active,
-        #seccionGraficos.active,
-        #seccionConfiguracion.active {
-            display: flex !important;
-            flex-direction: column;
-            height: calc(100vh - 60px);
-        }
-        
         .bottom-fixed-container {
-            display: none; /* Oculto por defecto */
+            display: none;
             position: fixed;
             bottom: 0;
             left: 0;
@@ -405,13 +419,12 @@
             box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
             z-index: 900;
             box-sizing: border-box;
-            display: flex;
             flex-direction: column;
             gap: 10px;
         }
         
-        /* Solo visible en sección Inicio */
-        #seccionInicio .bottom-fixed-container {
+        /* Mostrar cuando seccionInicio está activo */
+        .bottom-fixed-container.visible {
             display: flex;
         }
         
@@ -1811,9 +1824,9 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Inicio -->
+        <!-- Inicio - Contenedor único con header y scroll -->
         <div class="content-section active" id="seccionInicio">
-            <!-- 1. Botones de acción arriba -->
+            <!-- 1. Botones de acción (Header) -->
             <div class="action-buttons-top">
                 <button class="btn btn-secondary" onclick="abrirModalPresupuesto()">
                     <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1853,51 +1866,6 @@
                     <div class="empty-state-text">No hay artículos en la lista</div>
                     <div class="empty-state-link">
                         <a href="#" onclick="navigateTo('configuracion'); return false;">Personaliza los campos del formulario</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3, 4, 5. Elementos fijos en el fondo -->
-            <div class="bottom-fixed-container">
-                <!-- 3. Botón agregar artículo -->
-                <button class="btn btn-primary btn-add-item" onclick="abrirModalAgregar()">
-                    <svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                    </svg>
-                    Agregar artículo
-                </button>
-
-                <!-- 4. Presupuesto disponible -->
-                <div class="budget-card" id="budgetCard">
-                    <div class="budget-header">
-                        <span class="budget-label">Presupuesto disponible</span>
-                        <button class="budget-edit-btn" onclick="abrirModalPresupuesto()">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="budget-amount" id="budgetAmount">$0</div>
-                    <div class="budget-remaining" id="budgetRemaining"></div>
-                    <div class="budget-progress-bar">
-                        <div class="budget-progress-fill low" id="budgetProgressFill" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <!-- 5. Resumen en tres columnas -->
-                <div class="summary-grid">
-                    <div class="summary-col">
-                        <div class="summary-col-label">Subtotal</div>
-                        <div class="summary-col-value" id="subtotalDisplay">$0</div>
-                    </div>
-                    <div class="summary-col">
-                        <div class="summary-col-label">Descuento</div>
-                        <div class="summary-col-value" id="descuentosDisplay">-$0</div>
-                    </div>
-                    <div class="summary-col summary-col-total">
-                        <div class="summary-col-label">Total</div>
-                        <div class="summary-col-value" id="totalDisplay">$0</div>
                     </div>
                 </div>
             </div>
@@ -2150,6 +2118,51 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Footer con elementos fijos para INICIO -->
+    <div class="bottom-fixed-container">
+        <!-- 3. Botón agregar artículo -->
+        <button class="btn btn-primary btn-add-item" onclick="abrirModalAgregar()">
+            <svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            Agregar artículo
+        </button>
+
+        <!-- 4. Presupuesto disponible -->
+        <div class="budget-card" id="budgetCard">
+            <div class="budget-header">
+                <span class="budget-label">Presupuesto disponible</span>
+                <button class="budget-edit-btn" onclick="abrirModalPresupuesto()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="budget-amount" id="budgetAmount">$0</div>
+            <div class="budget-remaining" id="budgetRemaining"></div>
+            <div class="budget-progress-bar">
+                <div class="budget-progress-fill low" id="budgetProgressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- 5. Resumen en tres columnas -->
+        <div class="summary-grid">
+            <div class="summary-col">
+                <div class="summary-col-label">Subtotal</div>
+                <div class="summary-col-value" id="subtotalDisplay">$0</div>
+            </div>
+            <div class="summary-col">
+                <div class="summary-col-label">Descuento</div>
+                <div class="summary-col-value" id="descuentosDisplay">-$0</div>
+            </div>
+            <div class="summary-col summary-col-total">
+                <div class="summary-col-label">Total</div>
+                <div class="summary-col-value" id="totalDisplay">$0</div>
+            </div>
         </div>
     </div>
 
@@ -2428,6 +2441,14 @@
             actualizarTotales();
             renderizarListasGuardadas();
             aplicarTraducciones();
+            
+            // Mostrar footer en INICIO
+            const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
+            if (document.getElementById('seccionInicio').classList.contains('active')) {
+                bottomFixedContainer.classList.add('visible');
+                // Actualizar altura después de mostrar
+                setTimeout(actualizarAltoBottomFixedContainer, 0);
+            }
         }
 
         // Sidebar
@@ -2461,6 +2482,16 @@
             }
         }
 
+        function actualizarAltoBottomFixedContainer() {
+            const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
+            if (bottomFixedContainer && bottomFixedContainer.classList.contains('visible')) {
+                const altura = bottomFixedContainer.offsetHeight;
+                document.documentElement.style.setProperty('--bottom-fixed-height', altura + 'px');
+            } else {
+                document.documentElement.style.setProperty('--bottom-fixed-height', '0px');
+            }
+        }
+
         function navigateTo(seccion) {
             // Cerrar sidebar
             const sidebarElement = document.getElementById('sidebar');
@@ -2488,16 +2519,26 @@
                 section.classList.remove('active');
             });
 
+            // Controlar visibilidad del footer
+            const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
             if (seccion === 'inicio') {
                 document.getElementById('seccionInicio').classList.add('active');
-            } else if (seccion === 'listas') {
-                document.getElementById('seccionListas').classList.add('active');
-                renderizarListasGuardadas();
-            } else if (seccion === 'graficos') {
-                document.getElementById('seccionGraficos').classList.add('active');
-                renderizarGraficos();
-            } else if (seccion === 'configuracion') {
-                document.getElementById('seccionConfiguracion').classList.add('active');
+                bottomFixedContainer.classList.add('visible');
+                // Actualizar altura después de mostrar el footer
+                setTimeout(actualizarAltoBottomFixedContainer, 0);
+            } else {
+                if (seccion === 'listas') {
+                    document.getElementById('seccionListas').classList.add('active');
+                    renderizarListasGuardadas();
+                } else if (seccion === 'graficos') {
+                    document.getElementById('seccionGraficos').classList.add('active');
+                    renderizarGraficos();
+                } else if (seccion === 'configuracion') {
+                    document.getElementById('seccionConfiguracion').classList.add('active');
+                }
+                bottomFixedContainer.classList.remove('visible');
+                // Actualizar altura después de ocultar el footer
+                actualizarAltoBottomFixedContainer();
             }
         }
 
@@ -2944,6 +2985,11 @@
             } else {
                 budgetRemaining.textContent = 'Sin presupuesto establecido';
                 actualizarBarraProgreso(0);
+            }
+            
+            // Actualizar altura del footer si está visible
+            if (document.querySelector('.bottom-fixed-container').classList.contains('visible')) {
+                setTimeout(actualizarAltoBottomFixedContainer, 0);
             }
         }
         
