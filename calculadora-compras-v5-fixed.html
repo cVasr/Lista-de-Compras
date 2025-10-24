@@ -1,0 +1,3727 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Compras</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-color: #39ff14;
+            --primary-text: #39ff14;
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-input: #0f0f0f;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #808080;
+        }
+        
+        [data-theme="light"] {
+            --primary-text: #1a1a1a;
+            --bg-dark: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-input: #f0f0f0;
+            --border-color: #e0e0e0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #2a2a2a;
+            --text-muted: #666666;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 50%, var(--bg-dark) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        body.no-scroll {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+        
+        /* Header */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .menu-btn {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            color: var(--primary-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        
+        .menu-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary-text);
+        }
+        
+        .menu-btn:active {
+            background: rgba(57, 255, 20, 0.1);
+        }
+        
+        .app-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+        
+        .theme-switch {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .theme-switch:active {
+            background: rgba(57, 255, 20, 0.1);
+        }
+        
+        .theme-switch svg {
+            width: 22px;
+            height: 22px;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-icon-sun {
+            fill: var(--primary-text);
+            stroke: var(--primary-text);
+        }
+        
+        .theme-icon-moon {
+            fill: none;
+            stroke: var(--primary-text);
+        }
+        
+        .theme-switch .theme-icon-sun {
+            position: absolute;
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.8);
+        }
+        
+        .theme-switch .theme-icon-moon {
+            position: absolute;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        
+        [data-theme="light"] .theme-switch .theme-icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        
+        [data-theme="light"] .theme-switch .theme-icon-moon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.8);
+        }
+        
+        .header-spacer {
+            width: 40px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            transition: left 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+            z-index: 1100;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar-header {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .close-sidebar {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-sidebar svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-muted);
+        }
+        
+        .close-sidebar:active {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 16px 0;
+            flex: 1;
+        }
+        
+        .menu-item {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:active {
+            background: rgba(57, 255, 20, 0.1);
+        }
+        
+        .menu-item.active {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--primary-text);
+            border-left-color: var(--primary-text);
+        }
+        
+        .menu-item-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-item-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        
+        .menu-item-text {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1050;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-section {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+        
+        .content-section.active {
+            display: flex;
+        }
+        
+        /* Sección Inicio - Layout especial */
+        #seccionInicio {
+            padding: 0;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+        
+        .action-buttons-top {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            flex-wrap: wrap;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .items-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 220px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Otras secciones - Layout normal */
+        #seccionListas,
+        #seccionGraficos,
+        #seccionConfiguracion {
+            padding: 16px;
+            overflow-y: auto;
+            height: auto !important;
+        }
+        
+        .bottom-fixed-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 16px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            z-index: 800;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .btn-add-item {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Lista de Compras */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* Category Group */
+        .category-group {
+            margin-bottom: 8px;
+        }
+        
+        .category-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .item-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            padding-left: 44px;
+            padding-right: 140px;
+            transition: transform 0.2s, background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+            position: relative;
+            cursor: grab;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .item-card:active {
+            cursor: grabbing;
+        }
+        
+        .item-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        
+        /* Checkbox de compra */
+        .item-checkbox {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .checkbox-compra {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        /* Item comprado */
+        .item-comprado {
+            opacity: 0.5;
+        }
+        
+        .item-comprado .item-name,
+        .item-comprado .item-brand,
+        .item-comprado .item-price {
+            text-decoration: line-through;
+        }
+        
+        /* Drag handle */
+        .item-drag-handle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            color: var(--text-muted);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .item-card:hover .item-drag-handle {
+            opacity: 1;
+        }
+        
+        .item-drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .item-drag-handle svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .item-emoji {
+            font-size: 18px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        
+        .item-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .item-brand {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        
+        .item-content {
+            display: none;
+        }
+        
+        .item-details {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .item-detail-badge {
+            background: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .item-note {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        
+        .item-promo {
+            background: var(--primary-color);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        
+        .item-actions {
+            position: absolute;
+            top: 50%;
+            right: 38px;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+        }
+        
+        .item-btn-icon {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .item-btn-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Por defecto (modo oscuro) - iconos blancos */
+        .item-btn-icon svg {
+            stroke: #ffffff;
+        }
+        
+        /* Modo claro - iconos negros */
+        [data-theme="light"] .item-btn-icon svg {
+            stroke: #1a1a1a;
+        }
+        
+        .item-btn-icon:active {
+            background: var(--border-color);
+        }
+        
+        .item-footer {
+            position: absolute;
+            right: 110px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .item-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-text);
+            white-space: nowrap;
+        }
+        
+        /* Summary Card */
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .summary-row.total {
+            border-top: 2px solid var(--primary-color);
+            margin-top: 8px;
+            padding-top: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        /* Budget Card */
+        .budget-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .budget-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .budget-edit-btn {
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .budget-edit-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        /* Por defecto (modo oscuro) - icono blanco */
+        .budget-edit-btn svg {
+            stroke: #ffffff;
+        }
+        
+        /* Modo claro - icono negro */
+        [data-theme="light"] .budget-edit-btn svg {
+            stroke: #1a1a1a;
+        }
+        
+        .budget-edit-btn:active {
+            background: rgba(57, 255, 20, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .budget-edit-btn:active svg {
+            stroke: var(--primary-color);
+        }
+        
+        .budget-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-text);
+            margin-bottom: 6px;
+        }
+        
+        .budget-remaining {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .budget-remaining.warning {
+            color: #ff9500;
+        }
+        
+        .budget-remaining.danger {
+            color: #ff3232;
+        }
+        
+        /* Barra de progreso */
+        .budget-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .budget-progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        
+        .budget-progress-fill.low {
+            background: #39ff14;
+        }
+        
+        .budget-progress-fill.medium {
+            background: #ff9500;
+        }
+        
+        .budget-progress-fill.high {
+            background: #ff3232;
+        }
+        
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1px;
+            background: var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .summary-col {
+            background: var(--bg-card);
+            padding: 10px 8px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+        
+        .summary-col-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-col-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .summary-col-total {
+            background: rgba(57, 255, 20, 0.05);
+        }
+        
+        .summary-col-total .summary-col-label {
+            color: var(--primary-text);
+        }
+        
+        .summary-col-total .summary-col-value {
+            color: var(--primary-text);
+            font-size: 16px;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        .btn-primary:active {
+            background: #2ecc40;
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease, background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .btn-secondary:active {
+            background: var(--border-color);
+            transform: scale(0.98);
+        }
+        
+        .action-buttons-top .btn {
+            flex: 1;
+            min-width: 110px;
+            font-size: 14px;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 1;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-muted);
+        }
+        
+        .modal-close:active {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .promo-options {
+            display: none;
+            margin-top: 12px;
+        }
+        
+        .promo-options.active {
+            display: block;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .radio-option {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .radio-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-card);
+        }
+        
+        /* Configuración */
+        .config-section {
+            margin-bottom: 24px;
+        }
+        
+        .config-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-text);
+            margin-bottom: 8px;
+        }
+        
+        .config-description {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        
+        .config-option {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .config-checkbox {
+            padding: 12px 16px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        .checkbox-label span {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .config-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        /* Botón aplicar cambios en configuración */
+        .btn-aplicar-container {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            z-index: 100;
+        }
+        
+        .btn-aplicar-container .btn {
+            width: 100%;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .color-option {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .color-option.selected {
+            border-color: var(--text-primary);
+        }
+        
+        /* Lista Guardadas */
+        .saved-list-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .saved-list-card:active {
+            transform: scale(0.98);
+        }
+        
+        .saved-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .saved-list-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .saved-list-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .saved-list-info {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .saved-list-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .saved-list-actions .btn {
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .empty-state-link {
+            margin-top: 12px;
+        }
+        
+        .empty-state-link a {
+            color: var(--primary-text);
+            text-decoration: underline;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .empty-state-link a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Confirm Dialog */
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            width: calc(100% - 32px);
+            max-width: 400px;
+            z-index: 3000;
+            display: none;
+        }
+        
+        .confirm-dialog.active {
+            display: block;
+        }
+        
+        .confirm-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .confirm-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* Modal Resumen */
+        .modal-resumen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal-resumen.active {
+            display: flex;
+        }
+        
+        .resumen-container {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .resumen-header {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 2px solid #e0e0e0;
+            background: #ffffff;
+        }
+        
+        .resumen-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        
+        .resumen-date {
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        .resumen-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #ffffff;
+        }
+        
+        .resumen-item {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .resumen-item:last-child {
+            border-bottom: none;
+        }
+        
+        .resumen-item-info {
+            flex: 1;
+        }
+        
+        .resumen-item-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .resumen-item-details {
+            font-size: 13px;
+            color: #666666;
+        }
+        
+        .resumen-item-price {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a1a1a;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+        
+        .resumen-summary {
+            padding: 20px;
+            background: #f5f5f5;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .resumen-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 15px;
+            color: #1a1a1a;
+        }
+        
+        .resumen-summary-row.budget {
+            padding-top: 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #d0d0d0;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .resumen-summary-row.total {
+            border-top: 2px solid #1a1a1a;
+            padding-top: 12px;
+            margin-top: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #39ff14;
+        }
+        
+        .resumen-actions {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .resumen-actions .btn {
+            flex: 1;
+        }
+        
+        /* Esconder FAB cuando no esté en inicio */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            min-height: 300px;
+        }
+        
+        .chart-container canvas {
+            max-height: 400px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+        
+        /* Tabs de Mis Gastos */
+        .gastos-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 16px 16px 16px;
+            margin: 0 -16px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .gastos-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .gastos-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            min-width: 90px;
+            color: #ffffff;
+        }
+        
+        .gastos-tab:hover {
+            background: var(--bg-input);
+            border-color: var(--primary-color);
+        }
+        
+        .gastos-tab.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .tab-text {
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* Contenido de paneles */
+        .gastos-content {
+            position: relative;
+        }
+        
+        .gastos-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .gastos-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .panel-header {
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-text);
+            margin-bottom: 4px;
+        }
+        
+        .panel-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* Stat Cards */
+        .descuentos-cards,
+        .presupuesto-cards {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(57, 255, 20, 0.1);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        
+        .stat-card-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--primary-color);
+            stroke: var(--primary-color);
+        }
+        
+        .stat-card-content {
+            flex: 1;
+        }
+        
+        .stat-card-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        
+        .stat-card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+        
+        /* Panel Stats */
+        .panel-stats {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .stat-row-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .stat-row-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+        
+        /* Análisis de presupuesto */
+        #presupuestoAnalisis {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+        
+        .analisis-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .analisis-icon {
+            font-size: 24px;
+        }
+        
+        .analisis-text {
+            flex: 1;
+        }
+        
+        .analisis-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-text);
+            margin-bottom: 2px;
+        }
+        
+        .analisis-description {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .modal-content {
+                border-radius: 24px;
+                max-height: 80vh;
+            }
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+        
+        .sidebar-footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="app-header">
+        <button class="menu-btn" onclick="toggleSidebar()">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <div class="app-title">Lista de Compras</div>
+        <button class="theme-switch" onclick="toggleTheme()">
+            <svg class="theme-icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="21" x2="12" y2="23" stroke-width="2" stroke-linecap="round"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke-width="2" stroke-linecap="round"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke-width="2" stroke-linecap="round"/>
+                <line x1="1" y1="12" x2="3" y2="12" stroke-width="2" stroke-linecap="round"/>
+                <line x1="21" y1="12" x2="23" y2="12" stroke-width="2" stroke-linecap="round"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke-width="2" stroke-linecap="round"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menú</div>
+            <button class="close-sidebar" onclick="toggleSidebar()">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" onclick="navigateTo('inicio')">
+                <span class="menu-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" fill="currentColor"/>
+                        <path d="M9 22V12H15V22" fill="var(--bg-card)"/>
+                    </svg>
+                </span>
+                <span class="menu-item-text">Inicio</span>
+            </div>
+            <div class="menu-item" onclick="navigateTo('listas')">
+                <span class="menu-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
+                        <line x1="7" y1="8" x2="17" y2="8" stroke="var(--bg-card)" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="7" y1="12" x2="17" y2="12" stroke="var(--bg-card)" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="7" y1="16" x2="13" y2="16" stroke="var(--bg-card)" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="menu-item-text">Listas guardadas</span>
+            </div>
+            <div class="menu-item" onclick="navigateTo('graficos')">
+                <span class="menu-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="12" width="4" height="9" fill="currentColor"/>
+                        <rect x="10" y="7" width="4" height="14" fill="currentColor"/>
+                        <rect x="17" y="3" width="4" height="18" fill="currentColor"/>
+                    </svg>
+                </span>
+                <span class="menu-item-text">Mis Gastos</span>
+            </div>
+            <div class="menu-item" onclick="navigateTo('configuracion')">
+                <span class="menu-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="currentColor"/>
+                        <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" fill="currentColor"/>
+                    </svg>
+                </span>
+                <span class="menu-item-text">Configuración</span>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-text">By: Gabriel Sebastian</div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Inicio -->
+        <div class="content-section active" id="seccionInicio">
+            <!-- 1. Botones de acción arriba -->
+            <div class="action-buttons-top">
+                <button class="btn btn-secondary" onclick="abrirModalPresupuesto()">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Presupuesto
+                </button>
+                <button class="btn btn-secondary" onclick="guardarLista()">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17 21V13H7V21M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Guardar lista
+                </button>
+                <button class="btn btn-secondary" onclick="confirmarLimpiar()">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Limpiar todo
+                </button>
+            </div>
+
+            <!-- 2. Lista de artículos con scroll -->
+            <div class="items-scroll-container">
+                <div id="listaCompras" class="items-list"></div>
+
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-state-icon">
+                        <svg style="width: 64px; height: 64px; opacity: 0.5;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="9" cy="21" r="1" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="20" cy="21" r="1" stroke="currentColor" stroke-width="2"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="empty-state-text">No hay artículos en la lista</div>
+                    <div class="empty-state-link">
+                        <a href="#" onclick="navigateTo('configuracion'); return false;">Personaliza los campos del formulario</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3, 4, 5. Elementos fijos en el fondo -->
+            <div class="bottom-fixed-container">
+                <!-- 3. Botón agregar artículo -->
+                <button class="btn btn-primary btn-add-item" onclick="abrirModalAgregar()">
+                    <svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                    Agregar artículo
+                </button>
+
+                <!-- 4. Presupuesto disponible -->
+                <div class="budget-card" id="budgetCard">
+                    <div class="budget-header">
+                        <span class="budget-label">Presupuesto disponible</span>
+                        <button class="budget-edit-btn" onclick="abrirModalPresupuesto()">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="budget-amount" id="budgetAmount">$0</div>
+                    <div class="budget-remaining" id="budgetRemaining"></div>
+                    <div class="budget-progress-bar">
+                        <div class="budget-progress-fill low" id="budgetProgressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- 5. Resumen en tres columnas -->
+                <div class="summary-grid">
+                    <div class="summary-col">
+                        <div class="summary-col-label">Subtotal</div>
+                        <div class="summary-col-value" id="subtotalDisplay">$0</div>
+                    </div>
+                    <div class="summary-col">
+                        <div class="summary-col-label">Descuento</div>
+                        <div class="summary-col-value" id="descuentosDisplay">-$0</div>
+                    </div>
+                    <div class="summary-col summary-col-total">
+                        <div class="summary-col-label">Total</div>
+                        <div class="summary-col-value" id="totalDisplay">$0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listas Guardadas -->
+        <div class="content-section" id="seccionListas">
+            <div id="listasGuardadas"></div>
+        </div>
+
+        <!-- Mis Gastos -->
+        <div class="content-section" id="seccionGraficos">
+            <!-- Tabs de indicadores -->
+            <div class="gastos-tabs">
+                <button class="gastos-tab active" onclick="cambiarTabGastos('top-articulos')" data-tab="top-articulos">
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="tab-text">Top Artículos</span>
+                </button>
+                <button class="gastos-tab" onclick="cambiarTabGastos('por-categoria')" data-tab="por-categoria">
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="12" width="4" height="9" fill="currentColor"/>
+                            <rect x="10" y="7" width="4" height="14" fill="currentColor"/>
+                            <rect x="17" y="3" width="4" height="18" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="tab-text">Por Categoría</span>
+                </button>
+                <button class="gastos-tab" onclick="cambiarTabGastos('descuentos')" data-tab="descuentos">
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                            <path d="M9 9L15 15M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="tab-text">Descuentos</span>
+                </button>
+                <button class="gastos-tab" onclick="cambiarTabGastos('comparacion')" data-tab="comparacion">
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M7 14L12 9L15 12L21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="tab-text">Comparación</span>
+                </button>
+                <button class="gastos-tab" onclick="cambiarTabGastos('presupuesto')" data-tab="presupuesto">
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="tab-text">Presupuesto</span>
+                </button>
+            </div>
+
+            <!-- Contenido de cada tab -->
+            <div class="gastos-content">
+                <!-- Tab 1: Top 5 Artículos -->
+                <div class="gastos-panel active" id="panel-top-articulos">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Top 5 Artículos con Mayor Gasto</h3>
+                        <p class="panel-subtitle">Los productos en los que más has gastado</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartTopArticulos"></canvas>
+                    </div>
+                    <div class="panel-stats" id="statsTopArticulos"></div>
+                </div>
+
+                <!-- Tab 2: Gastos por Categoría -->
+                <div class="gastos-panel" id="panel-por-categoria">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Gastos por Categoría</h3>
+                        <p class="panel-subtitle">Distribución de tu dinero por categorías</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartCategorias"></canvas>
+                    </div>
+                    <div class="panel-stats" id="statsCategorias"></div>
+                </div>
+
+                <!-- Tab 3: Impacto de Descuentos -->
+                <div class="gastos-panel" id="panel-descuentos">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Impacto de Descuentos</h3>
+                        <p class="panel-subtitle">Cuánto has ahorrado con promociones</p>
+                    </div>
+                    <div class="descuentos-cards">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13.41 18.09L12 17.23L10.59 18.09L10.95 16.47L9.73 15.29L11.37 15.07L12 13.56L12.63 15.07L14.27 15.29L13.05 16.47L13.41 18.09ZM12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">Total Ahorrado</div>
+                                <div class="stat-card-value" id="totalAhorrado">$0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 6H16V4C16 2.89 15.11 2 14 2H10C8.89 2 8 2.89 8 4V6H4C2.89 6 2.01 6.89 2.01 8L2 19C2 20.11 2.89 21 4 21H20C21.11 21 22 20.11 22 19V8C22 6.89 21.11 6 20 6ZM10 4H14V6H10V4ZM12 17L7 12H10V9H14V12H17L12 17Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">Productos con Descuento</div>
+                                <div class="stat-card-value" id="productosConDescuento">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 11V3H8V9H2V21H22V11H16ZM10 5H14V19H10V5ZM4 11H8V19H4V11ZM20 19H16V13H20V19Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">% de Ahorro Promedio</div>
+                                <div class="stat-card-value" id="porcentajeAhorro">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartDescuentos"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Comparación con Listas Anteriores -->
+                <div class="gastos-panel" id="panel-comparacion">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Comparación con Listas Anteriores</h3>
+                        <p class="panel-subtitle">Evolución de tus gastos en el tiempo</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartComparacion"></canvas>
+                    </div>
+                    <div class="panel-stats" id="statsComparacion"></div>
+                </div>
+
+                <!-- Tab 5: Presupuesto vs Real -->
+                <div class="gastos-panel" id="panel-presupuesto">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Presupuesto vs Gasto Real</h3>
+                        <p class="panel-subtitle">Análisis de tu lista más reciente</p>
+                    </div>
+                    <div class="presupuesto-cards">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">Presupuesto</div>
+                                <div class="stat-card-value" id="presupuestoPlaneado">$0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M2 10H22M7 15H9M12 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">Gasto Real</div>
+                                <div class="stat-card-value" id="gastoReal">$0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M8 12H16M12 8V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">Diferencia</div>
+                                <div class="stat-card-value" id="diferencia">$0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartPresupuesto"></canvas>
+                    </div>
+                    <div id="presupuestoAnalisis"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración -->
+        <div class="content-section" id="seccionConfiguracion">
+            <div class="config-section">
+                <div class="config-title">🌍 Idioma</div>
+                <div class="config-option">
+                    <select class="form-input" id="selectIdioma" onchange="cambiarIdiomaTemp()">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <div class="config-title">📝 Campos del Formulario</div>
+                <div class="config-description">Selecciona qué campos quieres mostrar al agregar artículos</div>
+                
+                <div class="config-option config-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkMarca" onchange="toggleCampo('marca')">
+                        <span>Marca</span>
+                    </label>
+                </div>
+                
+                <div class="config-option config-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkCategoria" onchange="toggleCampo('categoria')">
+                        <span>Categoría</span>
+                    </label>
+                </div>
+                
+                <div class="config-option config-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkNota" onchange="toggleCampo('nota')">
+                        <span>Nota</span>
+                    </label>
+                </div>
+                
+                <div class="config-option config-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkPromociones" onchange="toggleCampo('promociones')">
+                        <span>Promociones/Descuentos</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <div class="config-title">💰 Formato de Precios</div>
+                <div class="config-option config-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkDecimales" onchange="toggleDecimales()">
+                        <span>Mostrar decimales ($58,000.00)</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Agregar/Editar Artículo -->
+    <div class="modal" id="modalArticulo">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalArticuloTitulo">Agregar artículo</div>
+                <button class="modal-close" onclick="cerrarModalArticulo()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nombre del producto</label>
+                    <input type="text" class="form-input" id="nombreProducto" placeholder="Escribe el nombre del producto">
+                </div>
+
+                <div class="form-group" id="campoMarca" style="display: none;">
+                    <label class="form-label">Marca (opcional)</label>
+                    <input type="text" class="form-input" id="marcaProducto" placeholder="Ej: Alpina, Colanta, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <div class="form-row">
+                        <input type="number" class="form-input" id="cantidadProducto" placeholder="1" min="0.01" step="0.01">
+                        <select class="form-input" id="tipoUnidad">
+                            <option value="unidad">Unidad</option>
+                            <option value="libras">Libras</option>
+                            <option value="kilogramos">Kilogramos</option>
+                            <option value="gramos">Gramos</option>
+                            <option value="litros">Litros</option>
+                            <option value="mililitros">Mililitros</option>
+                            <option value="galones">Galones</option>
+                            <option value="lata">Lata</option>
+                            <option value="paquete">Paquete</option>
+                            <option value="botella">Botella</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" id="campoCategoria" style="display: none;">
+                    <label class="form-label">Categoría (opcional)</label>
+                    <select class="form-input" id="categoriaProducto">
+                        <option value="">Sin categoría</option>
+                        <option value="lacteos">🥛 Lácteos</option>
+                        <option value="panaderia">🍞 Panadería</option>
+                        <option value="congelados">🧊 Congelados</option>
+                        <option value="cereales">🌾 Cereales</option>
+                        <option value="papeleria">📝 Papelería</option>
+                        <option value="salud">💊 Salud</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Precio</label>
+                    <input type="text" class="form-input" id="precioProducto" placeholder="0">
+                </div>
+
+                <div class="form-group" id="campoNota" style="display: none;">
+                    <label class="form-label">Nota (opcional)</label>
+                    <input type="text" class="form-input" id="notaProducto" placeholder="Agregar una nota...">
+                </div>
+
+                <div class="form-group" id="campoPromociones" style="display: none;">
+                    <div class="checkbox-group" onclick="togglePromo()">
+                        <input type="checkbox" id="tienePromo">
+                        <label>Tiene promoción o descuento</label>
+                    </div>
+                </div>
+
+                <div class="promo-options" id="promoOptions">
+                    <div class="radio-group">
+                        <div class="radio-option" id="opcionPromocion" onclick="seleccionarTipoPromo('promocion')">
+                            Promoción
+                        </div>
+                        <div class="radio-option" id="opcionDescuento" onclick="seleccionarTipoPromo('descuento')">
+                            Descuento
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="campoPromocion" style="display: none;">
+                        <label class="form-label">Tipo de promoción</label>
+                        <input type="text" class="form-input" id="tipoPromocion" placeholder="Ej: 2x1, 3x2, etc.">
+                    </div>
+
+                    <div class="form-group" id="campoDescuento" style="display: none;">
+                        <label class="form-label">Valor del descuento (%)</label>
+                        <input type="number" class="form-input" id="valorDescuento" placeholder="10" min="0" max="100">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalArticulo()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarArticulo()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Guardar Lista -->
+    <div class="modal" id="modalGuardar">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17 21V13H7V21M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Guardar Lista
+                </div>
+                <button class="modal-close" onclick="cerrarModalGuardar()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nombre de la lista</label>
+                    <input type="text" class="form-input" id="nombreLista" placeholder="Ej: Compras del mes">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalGuardar()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarGuardarLista()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Presupuesto -->
+    <div class="modal" id="modalPresupuesto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Agregar Presupuesto
+                </div>
+                <button class="modal-close" onclick="cerrarModalPresupuesto()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Presupuesto disponible</label>
+                    <input type="text" class="form-input" id="inputPresupuesto" placeholder="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalPresupuesto()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarPresupuesto()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-title" id="confirmTitle"></div>
+        <div class="confirm-text" id="confirmText"></div>
+        <div class="confirm-actions">
+            <button class="btn btn-secondary" onclick="cerrarConfirm()">Cancelar</button>
+            <button class="btn btn-primary" id="confirmButton">Seguro</button>
+        </div>
+    </div>
+
+    <!-- Modal Resumen -->
+    <div class="modal-resumen" id="modalResumen">
+        <div class="resumen-container" id="resumenContainer">
+            <div class="resumen-header">
+                <div class="resumen-title" id="resumenTitulo">Lista de Compras</div>
+                <div class="resumen-date" id="resumenFecha"></div>
+            </div>
+            
+            <div class="resumen-items" id="resumenItems"></div>
+            
+            <div class="resumen-summary" id="resumenSummary"></div>
+            
+            <div class="resumen-actions">
+                <button class="btn btn-secondary" onclick="cerrarResumen()">Cerrar</button>
+                <button class="btn btn-primary" onclick="descargarResumen()">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Descargar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let productos = [];
+        let editandoIndex = -1;
+        let idioma = 'es';
+        let colorTema = '#39ff14';
+        let tipoPromoSeleccionado = null;
+        let presupuesto = 0;
+        let temaActual = 'dark';
+        let mostrarCampos = {
+            marca: false,
+            categoria: false,
+            nota: false,
+            promociones: false
+        };
+        let mostrarDecimales = false;
+        
+        // Variables temporales para configuración
+        let mostrarCamposTemp = {
+            marca: false,
+            categoria: false,
+            nota: false,
+            promociones: false
+        };
+        let mostrarDecimalesTemp = false;
+        let idiomaTemp = 'es';
+
+        // Categorías con emojis
+        const categoriaEmojis = {
+            'lacteos': '🥛',
+            'panaderia': '🍞',
+            'congelados': '🧊',
+            'cereales': '🌾',
+            'papeleria': '📝',
+            'salud': '💊',
+            '': '📦'
+        };
+
+        // Símbolos de moneda
+        // Traducciones
+        const traducciones = {
+            es: {
+                inicio: 'Inicio',
+                listasGuardadas: 'Listas guardadas',
+                graficos: 'Gráficos',
+                configuracion: 'Configuración',
+                subtotal: 'Subtotal:',
+                descuentos: 'Descuentos:',
+                total: 'Total:',
+                guardarLista: '💾 Guardar lista',
+                limpiarTodo: '🗑️ Limpiar todo',
+                agregarArticulo: 'Agregar artículo',
+                sinArticulos: 'No hay artículos en la lista',
+                editar: 'Editar',
+                eliminar: 'Eliminar'
+            },
+            en: {
+                inicio: 'Home',
+                listasGuardadas: 'Saved Lists',
+                graficos: 'Charts',
+                configuracion: 'Settings',
+                subtotal: 'Subtotal:',
+                descuentos: 'Discounts:',
+                total: 'Total:',
+                guardarLista: '💾 Save list',
+                limpiarTodo: '🗑️ Clear all',
+                agregarArticulo: 'Add item',
+                sinArticulos: 'No items in the list',
+                editar: 'Edit',
+                eliminar: 'Delete'
+            }
+        };
+
+        // Inicializar
+        function init() {
+            cargarConfiguracion();
+            cargarProductos();
+            renderizarProductos();
+            actualizarTotales();
+            renderizarListasGuardadas();
+            aplicarTraducciones();
+        }
+
+        // Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Bloquear/desbloquear scroll
+            if (sidebar.classList.contains('active')) {
+                document.body.classList.add('no-scroll');
+            } else {
+                document.body.classList.remove('no-scroll');
+            }
+        }
+        
+        // Tema día/noche
+        function toggleTheme() {
+            temaActual = temaActual === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', temaActual);
+            localStorage.setItem('tema', temaActual);
+        }
+
+        function navigateTo(seccion) {
+            // Cerrar sidebar
+            const sidebarElement = document.getElementById('sidebar');
+            const overlayElement = document.getElementById('sidebarOverlay');
+            if (sidebarElement && sidebarElement.classList.contains('active')) {
+                toggleSidebar();
+            }
+
+            // Actualizar menú
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Activar el menú correcto según la sección
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                const onclick = item.getAttribute('onclick');
+                if (onclick && onclick.includes(`'${seccion}'`)) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Mostrar sección
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            if (seccion === 'inicio') {
+                document.getElementById('seccionInicio').classList.add('active');
+            } else if (seccion === 'listas') {
+                document.getElementById('seccionListas').classList.add('active');
+                renderizarListasGuardadas();
+            } else if (seccion === 'graficos') {
+                document.getElementById('seccionGraficos').classList.add('active');
+                renderizarGraficos();
+            } else if (seccion === 'configuracion') {
+                document.getElementById('seccionConfiguracion').classList.add('active');
+            }
+        }
+
+        // Modal Artículo
+        function abrirModalAgregar() {
+            editandoIndex = -1;
+            document.getElementById('modalArticuloTitulo').textContent = 'Agregar artículo';
+            limpiarFormulario();
+            aplicarVisibilidadCampos();
+            document.getElementById('modalArticulo').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
+
+        function abrirModalEditar(index) {
+            editandoIndex = index;
+            document.getElementById('modalArticuloTitulo').textContent = 'Editar artículo';
+            const producto = productos[index];
+            
+            document.getElementById('nombreProducto').value = producto.nombre;
+            document.getElementById('marcaProducto').value = producto.marca || '';
+            document.getElementById('cantidadProducto').value = producto.cantidad;
+            document.getElementById('tipoUnidad').value = producto.unidad;
+            document.getElementById('categoriaProducto').value = producto.categoria || '';
+            document.getElementById('precioProducto').value = formatearNumero(producto.precio);
+            document.getElementById('notaProducto').value = producto.nota || '';
+            
+            if (producto.tienePromo) {
+                document.getElementById('tienePromo').checked = true;
+                document.getElementById('promoOptions').classList.add('active');
+                seleccionarTipoPromo(producto.tipoPromo);
+                if (producto.tipoPromo === 'promocion') {
+                    document.getElementById('tipoPromocion').value = producto.descripcionPromo || '';
+                } else {
+                    document.getElementById('valorDescuento').value = producto.valorDescuento || '';
+                }
+            }
+            
+            aplicarVisibilidadCampos();
+            document.getElementById('modalArticulo').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
+
+        function cerrarModalArticulo() {
+            document.getElementById('modalArticulo').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+            limpiarFormulario();
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('nombreProducto').value = '';
+            document.getElementById('marcaProducto').value = '';
+            document.getElementById('cantidadProducto').value = '';
+            document.getElementById('tipoUnidad').value = 'unidad';
+            document.getElementById('categoriaProducto').value = '';
+            document.getElementById('precioProducto').value = '';
+            document.getElementById('notaProducto').value = '';
+            document.getElementById('tienePromo').checked = false;
+            document.getElementById('promoOptions').classList.remove('active');
+            document.getElementById('tipoPromocion').value = '';
+            document.getElementById('valorDescuento').value = '';
+            tipoPromoSeleccionado = null;
+        }
+
+        function togglePromo() {
+            const checkbox = document.getElementById('tienePromo');
+            const promoOptions = document.getElementById('promoOptions');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                promoOptions.classList.add('active');
+            } else {
+                promoOptions.classList.remove('active');
+                tipoPromoSeleccionado = null;
+            }
+        }
+
+        function seleccionarTipoPromo(tipo) {
+            tipoPromoSeleccionado = tipo;
+            document.getElementById('opcionPromocion').classList.remove('selected');
+            document.getElementById('opcionDescuento').classList.remove('selected');
+            document.getElementById('campoPromocion').style.display = 'none';
+            document.getElementById('campoDescuento').style.display = 'none';
+            
+            if (tipo === 'promocion') {
+                document.getElementById('opcionPromocion').classList.add('selected');
+                document.getElementById('campoPromocion').style.display = 'block';
+            } else if (tipo === 'descuento') {
+                document.getElementById('opcionDescuento').classList.add('selected');
+                document.getElementById('campoDescuento').style.display = 'block';
+            }
+        }
+
+        function confirmarArticulo() {
+            const nombre = document.getElementById('nombreProducto').value.trim();
+            
+            if (!nombre) {
+                alert('El nombre del producto es obligatorio');
+                return;
+            }
+
+            const producto = {
+                nombre: nombre,
+                marca: document.getElementById('marcaProducto').value.trim(),
+                cantidad: parseFloat(document.getElementById('cantidadProducto').value) || 1,
+                unidad: document.getElementById('tipoUnidad').value,
+                categoria: document.getElementById('categoriaProducto').value,
+                precio: limpiarNumero(document.getElementById('precioProducto').value),
+                nota: document.getElementById('notaProducto').value.trim(),
+                tienePromo: document.getElementById('tienePromo').checked,
+                tipoPromo: tipoPromoSeleccionado,
+                descripcionPromo: document.getElementById('tipoPromocion').value.trim(),
+                valorDescuento: parseFloat(document.getElementById('valorDescuento').value) || 0
+            };
+
+            // Calcular total
+            let total = producto.cantidad * producto.precio;
+            let descuento = 0;
+
+            if (producto.tienePromo && producto.tipoPromo === 'descuento' && producto.valorDescuento > 0) {
+                descuento = total * (producto.valorDescuento / 100);
+                total = total - descuento;
+            }
+
+            producto.total = total;
+            producto.descuento = descuento;
+
+            if (editandoIndex >= 0) {
+                productos[editandoIndex] = producto;
+            } else {
+                productos.push(producto);
+            }
+
+            guardarProductos();
+            renderizarProductos();
+            actualizarTotales();
+            cerrarModalArticulo();
+        }
+
+        // Renderizar productos
+        function renderizarProductos() {
+            const lista = document.getElementById('listaCompras');
+            const emptyState = document.getElementById('emptyState');
+
+            if (productos.length === 0) {
+                lista.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            lista.style.display = 'flex';
+            emptyState.style.display = 'none';
+
+            // Agrupar por categoría si existe
+            const productosPorCategoria = {};
+            const productosSinCategoria = [];
+            
+            productos.forEach((prod, index) => {
+                const prodConIndex = { ...prod, originalIndex: index };
+                if (prod.categoria && mostrarCampos.categoria) {
+                    if (!productosPorCategoria[prod.categoria]) {
+                        productosPorCategoria[prod.categoria] = [];
+                    }
+                    productosPorCategoria[prod.categoria].push(prodConIndex);
+                } else {
+                    productosSinCategoria.push(prodConIndex);
+                }
+            });
+
+            let html = '';
+            
+            // Renderizar productos agrupados por categoría
+            Object.entries(productosPorCategoria).forEach(([categoria, items]) => {
+                html += `<div class="category-group">
+                    <div class="category-header">${categoriaEmojis[categoria] || '📦'} ${getCategoriaTexto(categoria)}</div>`;
+                items.forEach(prod => {
+                    html += generarHTMLProducto(prod, prod.originalIndex);
+                });
+                html += `</div>`;
+            });
+            
+            // Renderizar productos sin categoría
+            productosSinCategoria.forEach(prod => {
+                html += generarHTMLProducto(prod, prod.originalIndex);
+            });
+
+            lista.innerHTML = html;
+            
+            // Inicializar drag and drop
+            setTimeout(inicializarDragAndDrop, 100);
+        }
+        
+        function generarHTMLProducto(prod, index) {
+            const comprado = prod.comprado || false;
+            const claseComprado = comprado ? 'item-comprado' : '';
+            
+            // Construir info inline
+            let infoInline = `${prod.cantidad} ${prod.unidad}`;
+            if (mostrarCampos.marca && prod.marca) infoInline += ` • ${prod.marca}`;
+            if (prod.tienePromo) {
+                const promoText = prod.tipoPromo === 'promocion' ? prod.descripcionPromo : `${prod.valorDescuento}% OFF`;
+                infoInline += ` • 🎁 ${promoText}`;
+            }
+            
+            return `
+                <div class="item-card ${claseComprado}" draggable="true" data-index="${index}">
+                    <div class="item-checkbox">
+                        <input type="checkbox" ${comprado ? 'checked' : ''} onchange="toggleComprado(${index})" class="checkbox-compra">
+                    </div>
+                    
+                    <div class="item-header">
+                        <div class="item-emoji">${categoriaEmojis[prod.categoria] || '📦'}</div>
+                        <div class="item-info">
+                            <div class="item-name">${prod.nombre}</div>
+                            <div class="item-detail-badge">${infoInline}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="item-footer">
+                        <div class="item-price">${formatearPrecio(prod.total)}</div>
+                    </div>
+                    
+                    <div class="item-actions">
+                        <button class="item-btn-icon" onclick="event.stopPropagation(); abrirModalEditar(${index})">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="item-btn-icon" onclick="event.stopPropagation(); confirmarEliminar(${index})">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="item-drag-handle">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 5h2v2H9V5zm0 6h2v2H9v-2zm0 6h2v2H9v-2zm6-12h2v2h-2V5zm0 6h2v2h-2v-2zm0 6h2v2h-2v-2z"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleComprado(index) {
+            productos[index].comprado = !productos[index].comprado;
+            guardarProductos();
+            renderizarProductos();
+            actualizarTotales();
+        }
+        
+        // Drag and Drop para reordenar
+        let draggedElement = null;
+        let draggedIndex = null;
+        
+        function inicializarDragAndDrop() {
+            const lista = document.getElementById('listaCompras');
+            if (!lista) return;
+            
+            // Remover listeners anteriores clonando el nodo
+            const newLista = lista.cloneNode(true);
+            lista.parentNode.replaceChild(newLista, lista);
+            const listaActualizada = document.getElementById('listaCompras');
+            
+            listaActualizada.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('item-card')) {
+                    draggedElement = e.target;
+                    draggedIndex = parseInt(e.target.dataset.index);
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', e.target.innerHTML);
+                }
+            });
+            
+            listaActualizada.addEventListener('dragend', function(e) {
+                if (e.target.classList.contains('item-card')) {
+                    e.target.classList.remove('dragging');
+                }
+            });
+            
+            listaActualizada.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                
+                const dragging = document.querySelector('.dragging');
+                if (!dragging) return;
+                
+                const afterElement = getDragAfterElement(listaActualizada, e.clientY);
+                
+                if (afterElement == null) {
+                    listaActualizada.appendChild(dragging);
+                } else {
+                    listaActualizada.insertBefore(dragging, afterElement);
+                }
+            });
+            
+            listaActualizada.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (draggedIndex === null) return;
+                
+                // Obtener todos los items cards en su orden actual en el DOM
+                const allCards = [...listaActualizada.querySelectorAll('.item-card')];
+                const draggedCard = allCards.find(card => parseInt(card.dataset.index) === draggedIndex);
+                
+                if (!draggedCard) return;
+                
+                // Encontrar el nuevo índice en el array de productos
+                let newIndex = 0;
+                for (let i = 0; i < allCards.length; i++) {
+                    if (allCards[i] === draggedCard) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+                
+                // Solo reordenar si cambió de posición
+                if (draggedIndex !== newIndex) {
+                    // Reordenar el array de productos
+                    const [movedItem] = productos.splice(draggedIndex, 1);
+                    productos.splice(newIndex, 0, movedItem);
+                    
+                    // Guardar
+                    guardarProductos();
+                }
+                
+                // Limpiar estado
+                draggedElement = null;
+                draggedIndex = null;
+                
+                // Renderizar
+                renderizarProductos();
+                actualizarTotales();
+            });
+        }
+        
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.item-card:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+        
+        function getCategoriaTexto(categoria) {
+            const opciones = {
+                'lacteos': 'Lácteos',
+                'panaderia': 'Panadería',
+                'congelados': 'Congelados',
+                'cereales': 'Cereales',
+                'papeleria': 'Papelería',
+                'salud': 'Salud'
+            };
+            return opciones[categoria] || '';
+        }
+
+        // Actualizar totales
+        function actualizarTotales() {
+            const subtotal = productos.reduce((sum, p) => sum + (p.total + p.descuento), 0);
+            const descuentos = productos.reduce((sum, p) => sum + p.descuento, 0);
+            const total = productos.reduce((sum, p) => sum + p.total, 0);
+
+            document.getElementById('subtotalDisplay').textContent = formatearPrecio(subtotal);
+            document.getElementById('descuentosDisplay').textContent = '-' + formatearPrecio(descuentos);
+            document.getElementById('totalDisplay').textContent = formatearPrecio(total);
+            
+            // Actualizar presupuesto
+            actualizarPresupuesto(total);
+        }
+        
+        function actualizarPresupuesto(total) {
+            const budgetAmount = document.getElementById('budgetAmount');
+            const budgetRemaining = document.getElementById('budgetRemaining');
+            
+            // Calcular total gastado (solo artículos comprados)
+            const totalGastado = productos
+                .filter(p => p.comprado)
+                .reduce((sum, p) => sum + p.total, 0);
+            
+            budgetAmount.textContent = formatearPrecio(presupuesto);
+            
+            if (presupuesto > 0) {
+                const porcentaje = ((totalGastado / presupuesto) * 100).toFixed(0);
+                
+                budgetRemaining.textContent = `${formatearPrecio(totalGastado)} de ${formatearPrecio(presupuesto)} (${porcentaje}% usado)`;
+                
+                // Cambiar color según el porcentaje
+                budgetRemaining.classList.remove('warning', 'danger');
+                if (porcentaje >= 100) {
+                    budgetRemaining.classList.add('danger');
+                } else if (porcentaje >= 80) {
+                    budgetRemaining.classList.add('warning');
+                }
+                
+                // Actualizar barra de progreso
+                actualizarBarraProgreso(porcentaje);
+            } else {
+                budgetRemaining.textContent = 'Sin presupuesto establecido';
+                actualizarBarraProgreso(0);
+            }
+        }
+        
+        function actualizarBarraProgreso(porcentaje) {
+            const progressFill = document.getElementById('budgetProgressFill');
+            if (!progressFill) return;
+            
+            const porcentajeLimitado = Math.min(porcentaje, 100);
+            progressFill.style.width = porcentajeLimitado + '%';
+            
+            // Cambiar color de la barra
+            progressFill.classList.remove('low', 'medium', 'high');
+            if (porcentaje >= 100) {
+                progressFill.classList.add('high');
+            } else if (porcentaje >= 80) {
+                progressFill.classList.add('medium');
+            } else {
+                progressFill.classList.add('low');
+            }
+        }
+
+        // Confirmar eliminar
+        function confirmarEliminar(index) {
+            mostrarConfirm(
+                '¿Eliminar artículo?',
+                '¿Estás seguro de que deseas eliminar este artículo?',
+                () => {
+                    productos.splice(index, 1);
+                    guardarProductos();
+                    renderizarProductos();
+                    actualizarTotales();
+                }
+            );
+        }
+
+        // Limpiar todo
+        function confirmarLimpiar() {
+            mostrarConfirm(
+                '¿Limpiar todo?',
+                '¿Estás seguro de que deseas eliminar todos los artículos?',
+                () => {
+                    productos = [];
+                    guardarProductos();
+                    renderizarProductos();
+                    actualizarTotales();
+                }
+            );
+        }
+
+        // Guardar lista
+        function guardarLista() {
+            if (productos.length === 0) {
+                alert('No hay artículos para guardar');
+                return;
+            }
+            document.getElementById('modalGuardar').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
+
+        function cerrarModalGuardar() {
+            document.getElementById('modalGuardar').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+            document.getElementById('nombreLista').value = '';
+        }
+
+        function confirmarGuardarLista() {
+            const nombreLista = document.getElementById('nombreLista').value.trim();
+            
+            if (!nombreLista) {
+                alert('El nombre de la lista es obligatorio');
+                return;
+            }
+
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const id = Date.now().toString();
+            
+            listas[id] = {
+                nombre: nombreLista,
+                fecha: new Date().toISOString(),
+                productos: productos,
+                total: productos.reduce((sum, p) => sum + p.total, 0)
+            };
+
+            localStorage.setItem('listasGuardadas', JSON.stringify(listas));
+            cerrarModalGuardar();
+            alert('Lista guardada exitosamente');
+        }
+        
+        // Presupuesto
+        function abrirModalPresupuesto() {
+            document.getElementById('inputPresupuesto').value = presupuesto > 0 ? formatearNumero(presupuesto) : '';
+            document.getElementById('modalPresupuesto').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
+        
+        function cerrarModalPresupuesto() {
+            document.getElementById('modalPresupuesto').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+        
+        function confirmarPresupuesto() {
+            const valor = limpiarNumero(document.getElementById('inputPresupuesto').value);
+            presupuesto = valor;
+            localStorage.setItem('presupuesto', presupuesto);
+            actualizarPresupuesto(productos.reduce((sum, p) => sum + p.total, 0));
+            cerrarModalPresupuesto();
+        }
+
+        // Listas guardadas
+        function renderizarListasGuardadas() {
+            const container = document.getElementById('listasGuardadas');
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const listasArray = Object.entries(listas);
+
+            if (listasArray.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <svg style="width: 64px; height: 64px; opacity: 0.5;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5H7C6.46957 5 5.96086 5.21071 5.58579 5.58579C5.21071 5.96086 5 6.46957 5 7V19C5 19.5304 5.21071 20.0391 5.58579 20.4142C5.96086 20.7893 6.46957 21 7 21H17C17.5304 21 18.0391 20.7893 18.4142 20.4142C18.7893 20.0391 19 19.5304 19 19V7C19 6.46957 18.7893 5.96086 18.4142 5.58579C18.0391 5.21071 17.5304 5 17 5H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 5C9 4.46957 9.21071 3.96086 9.58579 3.58579C9.96086 3.21071 10.4696 3 11 3H13C13.5304 3 14.0391 3.21071 14.4142 3.58579C14.7893 3.96086 15 4.46957 15 5C15 5.53043 14.7893 6.03914 14.4142 6.41421C14.0391 6.78929 13.5304 7 13 7H11C10.4696 7 9.96086 6.78929 9.58579 6.41421C9.21071 6.03914 9 5.53043 9 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="empty-state-text">No hay listas guardadas</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = listasArray.map(([id, lista]) => `
+                <div class="saved-list-card">
+                    <div class="saved-list-header">
+                        <div>
+                            <div class="saved-list-name">${lista.nombre}</div>
+                            <div class="saved-list-date">${new Date(lista.fecha).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    <div class="saved-list-info">
+                        <span>${lista.productos.length} artículos</span>
+                        <span>•</span>
+                        <span>${formatearPrecio(lista.total)}</span>
+                    </div>
+                    <div class="saved-list-actions">
+                        <button class="btn btn-secondary" onclick="generarResumenLista('${id}')">
+                            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 12H15M9 16H15M17 21H7C6.46957 21 5.96086 20.7893 5.58579 20.4142C5.21071 20.0391 5 19.5304 5 19V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H12.586C12.8512 3.00006 13.1055 3.10545 13.293 3.293L18.707 8.707C18.8946 8.89449 18.9999 9.1488 19 9.414V19C19 19.5304 18.7893 20.0391 18.4142 20.4142C18.0391 20.7893 17.5304 21 17 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Generar resumen
+                        </button>
+                        <button class="btn btn-primary" onclick="cargarLista('${id}')">
+                            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Cargar
+                        </button>
+                        <button class="btn btn-delete" onclick="eliminarLista('${id}')">
+                            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function cargarLista(id) {
+            mostrarConfirm(
+                '¿Cargar lista?',
+                '¿Estás seguro de que deseas cargar esta lista? Se reemplazará la lista actual.',
+                () => {
+                    const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+                    const lista = listas[id];
+                    
+                    if (lista) {
+                        productos = [...lista.productos];
+                        guardarProductos();
+                        renderizarProductos();
+                        actualizarTotales();
+                        
+                        // Cambiar a la sección de inicio
+                        document.querySelectorAll('.content-section').forEach(section => {
+                            section.classList.remove('active');
+                        });
+                        document.getElementById('seccionInicio').classList.add('active');
+                        
+                        // Actualizar menú activo
+                        document.querySelectorAll('.menu-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        document.querySelector('.menu-item').classList.add('active');
+                        
+                        alert('Lista cargada exitosamente');
+                    }
+                }
+            );
+        }
+
+        function eliminarLista(id) {
+            mostrarConfirm(
+                '¿Eliminar lista?',
+                '¿Estás seguro de que deseas eliminar esta lista?',
+                () => {
+                    const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+                    delete listas[id];
+                    localStorage.setItem('listasGuardadas', JSON.stringify(listas));
+                    renderizarListasGuardadas();
+                }
+            );
+        }
+        
+        // Generar resumen de lista
+        function generarResumenLista(id) {
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const lista = listas[id];
+            
+            if (!lista) return;
+            
+            // Calcular totales
+            const subtotal = lista.productos.reduce((sum, p) => sum + (p.total + p.descuento), 0);
+            const descuentos = lista.productos.reduce((sum, p) => sum + p.descuento, 0);
+            const total = lista.productos.reduce((sum, p) => sum + p.total, 0);
+            
+            // Título y fecha
+            document.getElementById('resumenTitulo').textContent = lista.nombre;
+            document.getElementById('resumenFecha').textContent = new Date(lista.fecha).toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Items
+            const itemsHTML = lista.productos.map(prod => `
+                <div class="resumen-item">
+                    <div class="resumen-item-info">
+                        <div class="resumen-item-name">${prod.nombre}</div>
+                        <div class="resumen-item-details">
+                            ${prod.marca ? prod.marca + ' • ' : ''}${prod.cantidad} ${prod.unidad}
+                            ${prod.tienePromo ? ' • ' + (prod.tipoPromo === 'promocion' ? prod.descripcionPromo : prod.valorDescuento + '% OFF') : ''}
+                        </div>
+                    </div>
+                    <div class="resumen-item-price">${formatearPrecio(prod.total)}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('resumenItems').innerHTML = itemsHTML;
+            
+            // Summary
+            const summaryHTML = `
+                ${presupuesto > 0 ? `
+                    <div class="resumen-summary-row budget">
+                        <span>Presupuesto:</span>
+                        <span>${formatearPrecio(presupuesto)}</span>
+                    </div>
+                ` : ''}
+                <div class="resumen-summary-row">
+                    <span>Subtotal:</span>
+                    <span>${formatearPrecio(subtotal)}</span>
+                </div>
+                <div class="resumen-summary-row">
+                    <span>Descuentos:</span>
+                    <span>-${formatearPrecio(descuentos)}</span>
+                </div>
+                <div class="resumen-summary-row total">
+                    <span>Total:</span>
+                    <span>${formatearPrecio(total)}</span>
+                </div>
+            `;
+            
+            document.getElementById('resumenSummary').innerHTML = summaryHTML;
+            
+            // Mostrar modal
+            document.getElementById('modalResumen').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
+        
+        function cerrarResumen() {
+            document.getElementById('modalResumen').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+        
+        function descargarResumen() {
+            const container = document.getElementById('resumenContainer');
+            
+            // Guardar scroll actual
+            const itemsContainer = document.getElementById('resumenItems');
+            const scrollPos = itemsContainer.scrollTop;
+            
+            // Temporalmente hacer que el contenedor muestre todo el contenido
+            itemsContainer.style.maxHeight = 'none';
+            itemsContainer.style.overflow = 'visible';
+            
+            html2canvas(container, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                scrollY: -window.scrollY,
+                scrollX: -window.scrollX,
+                windowWidth: document.documentElement.scrollWidth,
+                windowHeight: document.documentElement.scrollHeight,
+                useCORS: true
+            }).then(canvas => {
+                // Restaurar scroll y estilos
+                itemsContainer.style.maxHeight = '';
+                itemsContainer.style.overflow = '';
+                itemsContainer.scrollTop = scrollPos;
+                
+                // Descargar imagen
+                const link = document.createElement('a');
+                const fecha = new Date().toISOString().split('T')[0];
+                link.download = `lista-compras-${fecha}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Gráficos
+        // Variables para gráficos
+        let chartInstances = {};
+        
+        function cambiarTabGastos(tabId) {
+            // Actualizar tabs
+            document.querySelectorAll('.gastos-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Actualizar paneles
+            document.querySelectorAll('.gastos-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(`panel-${tabId}`).classList.add('active');
+            
+            // Renderizar gráfico del tab activo
+            renderizarTabActivo(tabId);
+        }
+        
+        function renderizarTabActivo(tabId) {
+            switch(tabId) {
+                case 'top-articulos':
+                    renderizarTopArticulos();
+                    break;
+                case 'por-categoria':
+                    renderizarPorCategoria();
+                    break;
+                case 'descuentos':
+                    renderizarDescuentos();
+                    break;
+                case 'comparacion':
+                    renderizarComparacion();
+                    break;
+                case 'presupuesto':
+                    renderizarPresupuesto();
+                    break;
+            }
+        }
+        
+        function renderizarGraficos() {
+            // Renderizar el tab activo por defecto (top-articulos)
+            renderizarTopArticulos();
+        }
+        
+        function destruirGrafico(id) {
+            if (chartInstances[id]) {
+                chartInstances[id].destroy();
+                delete chartInstances[id];
+            }
+        }
+        
+        // 1. Top 5 Artículos
+        function renderizarTopArticulos() {
+            destruirGrafico('chartTopArticulos');
+            
+            if (productos.length === 0) {
+                document.getElementById('statsTopArticulos').innerHTML = '<div class="empty-state-text">No hay productos para mostrar</div>';
+                return;
+            }
+            
+            // Calcular top 5 por gasto total
+            const productosOrdenados = [...productos].sort((a, b) => b.total - a.total).slice(0, 5);
+            
+            const ctx = document.getElementById('chartTopArticulos').getContext('2d');
+            chartInstances['chartTopArticulos'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: productosOrdenados.map(p => p.nombre),
+                    datasets: [{
+                        label: 'Gasto Total',
+                        data: productosOrdenados.map(p => p.total),
+                        backgroundColor: '#39ff14',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Stats adicionales
+            const totalGasto = productos.reduce((sum, p) => sum + p.total, 0);
+            const statsHTML = productosOrdenados.map((p, i) => `
+                <div class="stat-row">
+                    <span class="stat-row-label">${i + 1}. ${p.nombre}</span>
+                    <span class="stat-row-value">${formatearPrecio(p.total)} (${((p.total / totalGasto) * 100).toFixed(1)}%)</span>
+                </div>
+            `).join('');
+            document.getElementById('statsTopArticulos').innerHTML = statsHTML;
+        }
+        
+        // 2. Gastos por Categoría
+        function renderizarPorCategoria() {
+            destruirGrafico('chartCategorias');
+            
+            if (productos.length === 0) {
+                document.getElementById('statsCategorias').innerHTML = '<div class="empty-state-text">No hay productos para mostrar</div>';
+                return;
+            }
+            
+            const categorias = {};
+            productos.forEach(p => {
+                const cat = p.categoria || 'sin-categoria';
+                categorias[cat] = (categorias[cat] || 0) + p.total;
+            });
+            
+            const ctx = document.getElementById('chartCategorias').getContext('2d');
+            chartInstances['chartCategorias'] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categorias).map(c => getCategoriaTexto(c)),
+                    datasets: [{
+                        data: Object.values(categorias),
+                        backgroundColor: ['#39ff14', '#00d4ff', '#ff0080', '#ffcc00', '#ff6b35', '#a855f7', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#ffffff', padding: 15 }
+                        }
+                    }
+                }
+            });
+            
+            // Stats
+            const totalGasto = Object.values(categorias).reduce((a, b) => a + b, 0);
+            const statsHTML = Object.entries(categorias)
+                .sort((a, b) => b[1] - a[1])
+                .map(([cat, total]) => `
+                    <div class="stat-row">
+                        <span class="stat-row-label">${getCategoriaTexto(cat)}</span>
+                        <span class="stat-row-value">${formatearPrecio(total)} (${((total / totalGasto) * 100).toFixed(1)}%)</span>
+                    </div>
+                `).join('');
+            document.getElementById('statsCategorias').innerHTML = statsHTML;
+        }
+        
+        // 3. Impacto de Descuentos
+        function renderizarDescuentos() {
+            destruirGrafico('chartDescuentos');
+            
+            const productosConPromo = productos.filter(p => p.tienePromo && p.tipoPromo === 'descuento');
+            const totalAhorrado = productosConPromo.reduce((sum, p) => {
+                const precioOriginal = p.total / (1 - p.valorDescuento / 100);
+                return sum + (precioOriginal - p.total);
+            }, 0);
+            
+            const promedioDescuento = productosConPromo.length > 0
+                ? productosConPromo.reduce((sum, p) => sum + p.valorDescuento, 0) / productosConPromo.length
+                : 0;
+            
+            document.getElementById('totalAhorrado').textContent = formatearPrecio(totalAhorrado);
+            document.getElementById('productosConDescuento').textContent = productosConPromo.length;
+            document.getElementById('porcentajeAhorro').textContent = promedioDescuento.toFixed(1) + '%';
+            
+            if (productosConPromo.length === 0) {
+                const chartContainer = document.getElementById('chartDescuentos');
+                if (chartContainer && chartContainer.parentElement) {
+                    chartContainer.parentElement.innerHTML = '<div class="empty-state-text">No hay productos con descuento</div>';
+                }
+                return;
+            }
+            
+            // Gráfico de barras con descuentos
+            const ctx = document.getElementById('chartDescuentos');
+            if (!ctx) return;
+            
+            chartInstances['chartDescuentos'] = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: productosConPromo.map(p => p.nombre),
+                    datasets: [{
+                        label: '% Descuento',
+                        data: productosConPromo.map(p => p.valorDescuento),
+                        backgroundColor: '#00d4ff',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#ffffff', callback: (value) => value + '%' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 4. Comparación con Listas Anteriores
+        function renderizarComparacion() {
+            destruirGrafico('chartComparacion');
+            
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const listasArray = Object.entries(listas)
+                .map(([id, lista]) => ({
+                    fecha: new Date(lista.fecha),
+                    total: lista.total,
+                    nombre: lista.nombre
+                }))
+                .sort((a, b) => a.fecha - b.fecha)
+                .slice(-6); // Últimas 6 listas
+            
+            if (listasArray.length === 0) {
+                document.getElementById('statsComparacion').innerHTML = '<div class="empty-state-text">No hay listas guardadas para comparar</div>';
+                return;
+            }
+            
+            const ctx = document.getElementById('chartComparacion').getContext('2d');
+            chartInstances['chartComparacion'] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: listasArray.map(l => l.fecha.toLocaleDateString('es', { month: 'short', day: 'numeric' })),
+                    datasets: [{
+                        label: 'Gasto Total',
+                        data: listasArray.map(l => l.total),
+                        borderColor: '#39ff14',
+                        backgroundColor: 'rgba(57, 255, 20, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#ffffff' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            
+            // Stats
+            const promedio = listasArray.reduce((sum, l) => sum + l.total, 0) / listasArray.length;
+            const maximo = Math.max(...listasArray.map(l => l.total));
+            const minimo = Math.min(...listasArray.map(l => l.total));
+            
+            document.getElementById('statsComparacion').innerHTML = `
+                <div class="stat-row">
+                    <span class="stat-row-label">Promedio</span>
+                    <span class="stat-row-value">${formatearPrecio(promedio)}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-row-label">Máximo</span>
+                    <span class="stat-row-value">${formatearPrecio(maximo)}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-row-label">Mínimo</span>
+                    <span class="stat-row-value">${formatearPrecio(minimo)}</span>
+                </div>
+            `;
+        }
+        
+        // 5. Presupuesto vs Real
+        function renderizarPresupuesto() {
+            destruirGrafico('chartPresupuesto');
+            
+            const totalActual = productos.reduce((sum, p) => sum + p.total, 0);
+            const diferencia = presupuesto - totalActual;
+            const porcentajeUsado = presupuesto > 0 ? (totalActual / presupuesto) * 100 : 0;
+            
+            document.getElementById('presupuestoPlaneado').textContent = formatearPrecio(presupuesto);
+            document.getElementById('gastoReal').textContent = formatearPrecio(totalActual);
+            document.getElementById('diferencia').textContent = formatearPrecio(Math.abs(diferencia));
+            document.getElementById('diferencia').style.color = diferencia >= 0 ? '#39ff14' : '#ff0080';
+            
+            if (presupuesto === 0) {
+                document.getElementById('presupuestoAnalisis').innerHTML = '<div class="empty-state-text">No has establecido un presupuesto</div>';
+                return;
+            }
+            
+            // Gráfico de gauge
+            const ctx = document.getElementById('chartPresupuesto').getContext('2d');
+            chartInstances['chartPresupuesto'] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Usado', 'Disponible'],
+                    datasets: [{
+                        data: [totalActual, Math.max(0, diferencia)],
+                        backgroundColor: [
+                            porcentajeUsado > 100 ? '#ff0080' : porcentajeUsado > 80 ? '#ffcc00' : '#39ff14',
+                            'rgba(255, 255, 255, 0.1)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    circumference: 180,
+                    rotation: -90,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    return context.label + ': ' + formatearPrecio(context.parsed);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Análisis
+            let analisisHTML = '';
+            if (porcentajeUsado <= 80) {
+                analisisHTML = `
+                    <div class="analisis-row">
+                        <div class="analisis-icon">✅</div>
+                        <div class="analisis-text">
+                            <div class="analisis-title">¡Excelente control!</div>
+                            <div class="analisis-description">Has usado el ${porcentajeUsado.toFixed(1)}% de tu presupuesto. Te quedan ${formatearPrecio(diferencia)} disponibles.</div>
+                        </div>
+                    </div>
+                `;
+            } else if (porcentajeUsado <= 100) {
+                analisisHTML = `
+                    <div class="analisis-row">
+                        <div class="analisis-icon">⚠️</div>
+                        <div class="analisis-text">
+                            <div class="analisis-title">Cerca del límite</div>
+                            <div class="analisis-description">Has usado el ${porcentajeUsado.toFixed(1)}% de tu presupuesto. Solo te quedan ${formatearPrecio(diferencia)}.</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                analisisHTML = `
+                    <div class="analisis-row">
+                        <div class="analisis-icon">🚨</div>
+                        <div class="analisis-text">
+                            <div class="analisis-title">Presupuesto excedido</div>
+                            <div class="analisis-description">Has gastado ${formatearPrecio(Math.abs(diferencia))} más de lo planeado (${porcentajeUsado.toFixed(1)}%).</div>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('presupuestoAnalisis').innerHTML = analisisHTML;
+        }
+
+        // Configuración
+        function cambiarIdioma() {
+            idioma = document.getElementById('selectIdioma').value;
+            localStorage.setItem('idioma', idioma);
+            aplicarTraducciones();
+        }
+
+        function aplicarTraducciones() {
+            // Aplicar traducciones a elementos visibles
+            renderizarProductos();
+            actualizarTotales();
+        }
+
+        // Utilidades
+        // Formatear precio con o sin decimales
+        function formatearPrecio(valor) {
+            if (mostrarDecimales) {
+                return '$' + valor.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                return '$' + Math.round(valor).toLocaleString('es-CO');
+            }
+        }
+
+        function formatearNumero(numero) {
+            return new Intl.NumberFormat('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(numero);
+        }
+
+        function limpiarNumero(texto) {
+            return parseFloat(texto.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        }
+
+        function mostrarConfirm(titulo, texto, callback) {
+            document.getElementById('confirmTitle').textContent = titulo;
+            document.getElementById('confirmText').textContent = texto;
+            document.getElementById('confirmDialog').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('active');
+            document.body.classList.add('no-scroll');
+            
+            document.getElementById('confirmButton').onclick = () => {
+                callback();
+                cerrarConfirm();
+            };
+        }
+
+        function cerrarConfirm() {
+            document.getElementById('confirmDialog').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+
+        // LocalStorage
+        function guardarProductos() {
+            localStorage.setItem('productos', JSON.stringify(productos));
+        }
+
+        function cargarProductos() {
+            productos = JSON.parse(localStorage.getItem('productos') || '[]');
+        }
+
+        function cargarConfiguracion() {
+            idioma = localStorage.getItem('idioma') || 'es';
+            presupuesto = parseFloat(localStorage.getItem('presupuesto')) || 0;
+            temaActual = localStorage.getItem('tema') || 'dark';
+            
+            // Cargar configuración de campos visibles
+            const camposGuardados = localStorage.getItem('mostrarCampos');
+            if (camposGuardados) {
+                mostrarCampos = JSON.parse(camposGuardados);
+            }
+            
+            // Cargar configuración de decimales
+            mostrarDecimales = localStorage.getItem('mostrarDecimales') === 'true';
+            
+            document.getElementById('selectIdioma').value = idioma;
+            document.documentElement.setAttribute('data-theme', temaActual);
+            
+            // Inicializar variables temporales
+            mostrarCamposTemp = {...mostrarCampos};
+            mostrarDecimalesTemp = mostrarDecimales;
+            idiomaTemp = idioma;
+            
+            // Actualizar checkboxes de configuración si existen
+            setTimeout(() => {
+                if (document.getElementById('checkMarca')) {
+                    document.getElementById('checkMarca').checked = mostrarCampos.marca;
+                    document.getElementById('checkCategoria').checked = mostrarCampos.categoria;
+                    document.getElementById('checkNota').checked = mostrarCampos.nota;
+                    document.getElementById('checkPromociones').checked = mostrarCampos.promociones;
+                    document.getElementById('checkDecimales').checked = mostrarDecimales;
+                }
+            }, 100);
+        }
+        
+        function guardarConfiguracionCampos() {
+            localStorage.setItem('mostrarCampos', JSON.stringify(mostrarCampos));
+            localStorage.setItem('mostrarDecimales', mostrarDecimales.toString());
+            aplicarVisibilidadCampos();
+            renderizarProductos();
+            actualizarTotales();
+        }
+        
+        function aplicarVisibilidadCampos() {
+            // En el modal de artículo
+            const campoMarca = document.getElementById('campoMarca');
+            const campoCategoria = document.getElementById('campoCategoria');
+            const campoNota = document.getElementById('campoNota');
+            const campoPromociones = document.getElementById('campoPromociones');
+            
+            if (campoMarca) campoMarca.style.display = mostrarCampos.marca ? 'block' : 'none';
+            if (campoCategoria) campoCategoria.style.display = mostrarCampos.categoria ? 'block' : 'none';
+            if (campoNota) campoNota.style.display = mostrarCampos.nota ? 'block' : 'none';
+            if (campoPromociones) campoPromociones.style.display = mostrarCampos.promociones ? 'block' : 'none';
+        }
+        
+        function toggleCampo(campo) {
+            mostrarCamposTemp[campo] = !mostrarCamposTemp[campo];
+            document.getElementById('check' + campo.charAt(0).toUpperCase() + campo.slice(1)).checked = mostrarCamposTemp[campo];
+            mostrarBotonAplicarCambios();
+        }
+        
+        function toggleDecimales() {
+            mostrarDecimalesTemp = !mostrarDecimalesTemp;
+            document.getElementById('checkDecimales').checked = mostrarDecimalesTemp;
+            mostrarBotonAplicarCambios();
+        }
+        
+        function cambiarIdiomaTemp() {
+            idiomaTemp = document.getElementById('selectIdioma').value;
+            mostrarBotonAplicarCambios();
+        }
+        
+        function mostrarBotonAplicarCambios() {
+            // Mostrar botón de aplicar cambios si no existe
+            let btnAplicar = document.getElementById('btnAplicarCambios');
+            if (!btnAplicar) {
+                const configContainer = document.getElementById('seccionConfiguracion');
+                btnAplicar = document.createElement('div');
+                btnAplicar.id = 'btnAplicarCambios';
+                btnAplicar.className = 'btn-aplicar-container';
+                btnAplicar.innerHTML = `
+                    <button class="btn btn-primary" onclick="confirmarAplicarCambios()">
+                        Aplicar Cambios
+                    </button>
+                `;
+                configContainer.appendChild(btnAplicar);
+            }
+            btnAplicar.style.display = 'block';
+        }
+        
+        function confirmarAplicarCambios() {
+            mostrarConfirm(
+                '¿Aplicar cambios?',
+                '¿Estás seguro de que deseas aplicar estos cambios en la configuración?',
+                () => {
+                    // Aplicar cambios
+                    mostrarCampos = {...mostrarCamposTemp};
+                    mostrarDecimales = mostrarDecimalesTemp;
+                    idioma = idiomaTemp;
+                    
+                    // Guardar en localStorage
+                    guardarConfiguracionCampos();
+                    localStorage.setItem('idioma', idioma);
+                    
+                    // Aplicar traducciones si cambió el idioma
+                    aplicarTraducciones();
+                    
+                    // Ocultar botón
+                    const btnAplicar = document.getElementById('btnAplicarCambios');
+                    if (btnAplicar) btnAplicar.style.display = 'none';
+                    
+                    alert('Cambios aplicados exitosamente');
+                },
+                () => {
+                    // Cancelar - restaurar valores
+                    mostrarCamposTemp = {...mostrarCampos};
+                    mostrarDecimalesTemp = mostrarDecimales;
+                    idiomaTemp = idioma;
+                    
+                    // Restaurar checkboxes
+                    document.getElementById('checkMarca').checked = mostrarCampos.marca;
+                    document.getElementById('checkCategoria').checked = mostrarCampos.categoria;
+                    document.getElementById('checkNota').checked = mostrarCampos.nota;
+                    document.getElementById('checkPromociones').checked = mostrarCampos.promociones;
+                    document.getElementById('checkDecimales').checked = mostrarDecimales;
+                    document.getElementById('selectIdioma').value = idioma;
+                    
+                    // Ocultar botón
+                    const btnAplicar = document.getElementById('btnAplicarCambios');
+                    if (btnAplicar) btnAplicar.style.display = 'none';
+                }
+            );
+        }
+
+        // Formateo de precio
+        document.getElementById('precioProducto').addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/[^\d,]/g, '');
+            if (valor) {
+                const partes = valor.split(',');
+                partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                e.target.value = partes.join(',');
+            }
+        });
+        
+        // Formateo de presupuesto
+        document.getElementById('inputPresupuesto').addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/[^\d,]/g, '');
+            if (valor) {
+                const partes = valor.split(',');
+                partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                e.target.value = partes.join(',');
+            }
+        });
+
+        // Inicializar app
+        window.onload = init;
+    </script>
+</body>
+</html>
