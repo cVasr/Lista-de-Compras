@@ -101,60 +101,75 @@
             color: var(--primary-text);
         }
         
-        .theme-switch {
-            width: 40px;
-            height: 40px;
-            background: transparent;
-            border: none;
+        /* Theme Toggle Switch Styles */
+        .theme-toggle-container {
             cursor: pointer;
+            user-select: none;
+        }
+        
+        .theme-toggle-track {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-toggle-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            transition: background 0.3s;
-            position: relative;
+            justify-content: space-between;
+            padding: 0 8px;
+            pointer-events: none;
         }
         
-        .theme-switch:active {
-            background: rgba(57, 255, 20, 0.1);
-        }
-        
-        .theme-switch svg {
-            width: 22px;
-            height: 22px;
+        .theme-icon {
+            width: 16px;
+            height: 16px;
             transition: all 0.3s ease;
         }
         
         .theme-icon-sun {
-            fill: var(--primary-text);
-            stroke: var(--primary-text);
+            fill: var(--primary-color);
+            opacity: 0.3;
         }
         
         .theme-icon-moon {
-            fill: none;
-            stroke: var(--primary-text);
-        }
-        
-        .theme-switch .theme-icon-sun {
-            position: absolute;
-            opacity: 0;
-            transform: rotate(-90deg) scale(0.8);
-        }
-        
-        .theme-switch .theme-icon-moon {
-            position: absolute;
+            fill: var(--text-secondary);
             opacity: 1;
-            transform: rotate(0deg) scale(1);
         }
         
-        [data-theme="light"] .theme-switch .theme-icon-sun {
+        /* Light theme state */
+        [data-theme="light"] .theme-toggle-thumb {
+            transform: translateX(28px);
+        }
+        
+        [data-theme="light"] .theme-icon-sun {
             opacity: 1;
-            transform: rotate(0deg) scale(1);
+            fill: var(--primary-color);
         }
         
-        [data-theme="light"] .theme-switch .theme-icon-moon {
-            opacity: 0;
-            transform: rotate(90deg) scale(0.8);
+        [data-theme="light"] .theme-icon-moon {
+            opacity: 0.3;
         }
         
         .header-spacer {
@@ -294,7 +309,6 @@
         
         .content-section {
             display: none;
-            flex: 1;
             flex-direction: column;
         }
         
@@ -302,59 +316,110 @@
             display: flex;
         }
         
-        /* Sección Inicio - Layout especial */
+        /* Sección Inicio - Layout especial con grid */
+        /* Sección Inicio - Layout especial con grid */
         #seccionInicio {
-            padding: 0;
-            height: calc(100vh - 60px);
+            padding: 16px;
             overflow: hidden;
         }
         
+        #seccionInicio.active {
+            display: grid !important;
+            grid-template-rows: auto 1fr auto;
+            gap: 16px;
+            height: calc(100vh - 60px);
+        }
+        
         .action-buttons-top {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            padding: 12px 16px;
-            flex-wrap: wrap;
-            background: var(--bg-dark);
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.3s ease, border-color 0.3s ease;
         }
         
         .items-scroll-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            padding-bottom: 220px;
+            overflow-y: scroll;
+            padding-bottom: 250px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
             -webkit-overflow-scrolling: touch;
+            min-height: 200px;
+            flex: 1;
+            scrollbar-gutter: stable;
         }
         
-        /* Otras secciones - Layout normal */
+        /* Ocultar scrollbar */
+        .items-scroll-container::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        
+        .items-scroll-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Otras secciones - Layout normal sin grid */
         #seccionListas,
         #seccionGraficos,
         #seccionConfiguracion {
             padding: 16px;
-            overflow-y: auto;
-            height: auto !important;
+            overflow-y: scroll;
+            scrollbar-gutter: stable;
+        }
+        
+        /* Ocultar scrollbar en secciones */
+        #seccionListas::-webkit-scrollbar,
+        #seccionGraficos::-webkit-scrollbar,
+        #seccionConfiguracion::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        
+        #seccionListas,
+        #seccionGraficos,
+        #seccionConfiguracion {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        #seccionListas.active,
+        #seccionGraficos.active,
+        #seccionConfiguracion.active {
+            display: flex !important;
+            flex-direction: column;
+            height: calc(100vh - 60px);
         }
         
         .bottom-fixed-container {
+            display: none; /* Oculto por defecto */
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--bg-dark);
             border-top: 1px solid var(--border-color);
-            padding: 10px 16px;
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
-            z-index: 800;
+            padding: 16px;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
             transition: background 0.3s ease, border-color 0.3s ease;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            z-index: 900;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* Solo visible en sección Inicio */
+        #seccionInicio .bottom-fixed-container {
+            display: flex;
         }
         
         .btn-add-item {
             width: 100%;
             padding: 10px;
             font-size: 14px;
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
         
         .btn:active {
@@ -388,16 +453,14 @@
         .item-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 12px;
-            padding-left: 44px;
-            padding-right: 140px;
-            transition: transform 0.2s, background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
             position: relative;
             cursor: grab;
-            min-height: 48px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
         }
         
         .item-card:active {
@@ -409,149 +472,130 @@
             cursor: grabbing;
         }
         
-        /* Checkbox de compra */
-        .item-checkbox {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        .checkbox-compra {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--primary-color);
-        }
-        
         /* Item comprado */
         .item-comprado {
             opacity: 0.5;
         }
         
         .item-comprado .item-name,
-        .item-comprado .item-brand,
         .item-comprado .item-price {
             text-decoration: line-through;
         }
         
-        /* Drag handle */
-        .item-drag-handle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
+        /* Fila 1: Nombre, Precio y Checkbox */
+        .item-row-1 {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            cursor: grab;
-            color: var(--text-muted);
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-        
-        .item-card:hover .item-drag-handle {
-            opacity: 1;
-        }
-        
-        .item-drag-handle:active {
-            cursor: grabbing;
-        }
-        
-        .item-drag-handle svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
-        
-        .item-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .item-emoji {
-            font-size: 18px;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-        
-        .item-info {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .item-name {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-primary);
-            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        
-        .item-brand {
-            font-size: 11px;
-            color: var(--text-muted);
             white-space: nowrap;
         }
         
-        .item-content {
-            display: none;
-        }
-        
-        .item-details {
+        .item-right-1 {
             display: flex;
             align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .item-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-text);
+            white-space: nowrap;
+        }
+        
+        .checkbox-compra {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+            flex-shrink: 0;
+        }
+        
+        /* Fila 2: Unidades, Marca, Categoría */
+        .item-row-2 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .item-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 3px 8px;
+            background: var(--bg-input);
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        
+        /* Fila 3: Promoción y Nota */
+        .item-row-3 {
+            display: flex;
+            flex-direction: column;
             gap: 6px;
         }
         
-        .item-detail-badge {
-            background: var(--bg-input);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-        }
-        
-        .item-note {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-style: italic;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 150px;
+        .item-promo,
+        .item-nota {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
         }
         
         .item-promo {
-            background: var(--primary-color);
-            color: #000;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            white-space: nowrap;
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-text);
         }
         
-        .item-actions {
-            position: absolute;
-            top: 50%;
-            right: 38px;
-            transform: translateY(-50%);
+        .item-promo svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--primary-color);
+            flex-shrink: 0;
+        }
+        
+        .item-nota {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid #ffcc00;
+            color: #ffcc00;
+            font-style: italic;
+        }
+        
+        .item-nota svg {
+            width: 16px;
+            height: 16px;
+            fill: #ffcc00;
+            flex-shrink: 0;
+        }
+        
+        /* Fila 4: Botones de acción */
+        .item-row-4 {
             display: flex;
-            gap: 4px;
+            justify-content: flex-end;
+            gap: 6px;
+            padding-top: 4px;
+            border-top: 1px solid var(--border-color);
         }
         
         .item-btn-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border: 1px solid var(--border-color);
             background: var(--bg-input);
             border-radius: 8px;
@@ -563,37 +607,61 @@
             padding: 0;
         }
         
+        .item-btn-icon:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .item-btn-icon:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+            background: var(--bg-input);
+            border-color: var(--border-color);
+        }
+        
+        .item-btn-icon:disabled:hover {
+            background: var(--bg-input);
+            border-color: var(--border-color);
+        }
+        
+        .item-btn-icon:disabled svg {
+            stroke: var(--text-muted);
+            fill: var(--text-muted);
+        }
+        
+        .item-btn-icon:disabled:hover svg {
+            stroke: var(--text-muted);
+            fill: var(--text-muted);
+        }
+        
         .item-btn-icon svg {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-primary);
+            fill: none;
+            transition: all 0.2s;
         }
         
-        /* Por defecto (modo oscuro) - iconos blancos */
-        .item-btn-icon svg {
-            stroke: #ffffff;
+        .item-btn-icon:hover svg {
+            stroke: #000;
+            fill: #000;
         }
         
-        /* Modo claro - iconos negros */
-        [data-theme="light"] .item-btn-icon svg {
-            stroke: #1a1a1a;
+        .item-btn-drag svg {
+            fill: var(--text-primary);
+            stroke: none;
         }
         
-        .item-btn-icon:active {
-            background: var(--border-color);
+        .item-btn-icon:hover .item-btn-drag svg,
+        .item-btn-drag:hover svg {
+            fill: #000;
         }
         
-        .item-footer {
-            position: absolute;
-            right: 110px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        .item-price {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--primary-text);
-            white-space: nowrap;
+        /* Responsive - Mobile */
+        @media (max-width: 480px) {
+            .item-row-3 {
+                flex-direction: column;
+            }
         }
         
         /* Summary Card */
@@ -627,7 +695,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 0;
             transition: background 0.3s ease, border-color 0.3s ease;
         }
         
@@ -647,8 +715,8 @@
         }
         
         .budget-edit-btn {
-            width: 28px;
-            height: 28px;
+            width: 36px;
+            height: 36px;
             background: transparent;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -660,18 +728,11 @@
         }
         
         .budget-edit-btn svg {
-            width: 14px;
-            height: 14px;
-        }
-        
-        /* Por defecto (modo oscuro) - icono blanco */
-        .budget-edit-btn svg {
-            stroke: #ffffff;
-        }
-        
-        /* Modo claro - icono negro */
-        [data-theme="light"] .budget-edit-btn svg {
-            stroke: #1a1a1a;
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-primary);
+            fill: none;
+            transition: stroke 0.3s;
         }
         
         .budget-edit-btn:active {
@@ -788,10 +849,10 @@
         
         .btn {
             flex: 1;
-            padding: 12px;
+            padding: 8px;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -812,6 +873,13 @@
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
             transition: all 0.2s ease, background 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 8px;
+            font-size: 9px;
         }
         
         .btn-secondary:active {
@@ -821,8 +889,8 @@
         
         .action-buttons-top .btn {
             flex: 1;
-            min-width: 110px;
-            font-size: 14px;
+            min-width: auto;
+            font-size: 9px;
         }
         
         /* Modal */
@@ -1085,8 +1153,14 @@
             z-index: 100;
         }
         
+        .btn-aplicar-container .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+        
         .btn-aplicar-container .btn {
-            width: 100%;
+            flex: 1;
         }
         
         .color-grid {
@@ -1392,9 +1466,9 @@
         
         /* Tabs de Mis Gastos */
         .gastos-tabs {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            overflow-x: auto;
             padding: 0 16px 16px 16px;
             margin: 0 -16px;
             scrollbar-width: none;
@@ -1409,16 +1483,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 12px 16px;
+            justify-content: center;
+            gap: 3px;
+            padding: 6px 8px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s;
-            white-space: nowrap;
-            min-width: 90px;
-            color: #ffffff;
+            color: var(--text-primary);
+            font-size: 9px;
+            font-weight: 600;
         }
         
         .gastos-tab:hover {
@@ -1429,20 +1504,27 @@
         .gastos-tab.active {
             background: var(--primary-color);
             border-color: var(--primary-color);
-            color: #000;
+            color: #000000;
         }
         
         .tab-icon {
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
         .tab-icon svg {
-            width: 20px;
-            height: 20px;
+            width: 14px;
+            height: 14px;
+            fill: var(--text-primary);
+            stroke: var(--text-primary);
+        }
+        
+        .gastos-tab.active .tab-icon svg {
+            fill: #000000;
+            stroke: #000000;
         }
         
         .tab-text {
@@ -1454,6 +1536,7 @@
         /* Contenido de paneles */
         .gastos-content {
             position: relative;
+            margin-top: 16px;
         }
         
         .gastos-panel {
@@ -1644,22 +1727,27 @@
             </svg>
         </button>
         <div class="app-title">Lista de Compras</div>
-        <button class="theme-switch" onclick="toggleTheme()">
-            <svg class="theme-icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3" stroke-width="2" stroke-linecap="round"/>
-                <line x1="12" y1="21" x2="12" y2="23" stroke-width="2" stroke-linecap="round"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke-width="2" stroke-linecap="round"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke-width="2" stroke-linecap="round"/>
-                <line x1="1" y1="12" x2="3" y2="12" stroke-width="2" stroke-linecap="round"/>
-                <line x1="21" y1="12" x2="23" y2="12" stroke-width="2" stroke-linecap="round"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke-width="2" stroke-linecap="round"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
+        <div class="theme-toggle-container" onclick="toggleTheme()">
+            <div class="theme-toggle-track">
+                <div class="theme-toggle-icons">
+                    <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                        <line x1="12" y1="2" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="12" y1="20" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="2" y1="12" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="20" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="theme-toggle-thumb"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Sidebar -->
@@ -1706,8 +1794,8 @@
             <div class="menu-item" onclick="navigateTo('configuracion')">
                 <span class="menu-item-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="currentColor"/>
-                        <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                        <path d="M12 1V3M12 21V23M23 12H21M3 12H1M20.485 3.515L19.071 4.929M4.929 19.071L3.515 20.485M20.485 20.485L19.071 19.071M4.929 4.929L3.515 3.515" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </span>
                 <span class="menu-item-text">Configuración</span>
@@ -1785,8 +1873,8 @@
                         <span class="budget-label">Presupuesto disponible</span>
                         <button class="budget-edit-btn" onclick="abrirModalPresupuesto()">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
                     </div>
@@ -2308,8 +2396,8 @@
                 subtotal: 'Subtotal:',
                 descuentos: 'Descuentos:',
                 total: 'Total:',
-                guardarLista: '💾 Guardar lista',
-                limpiarTodo: '🗑️ Limpiar todo',
+                guardarLista: 'Guardar lista',
+                limpiarTodo: 'Limpiar todo',
                 agregarArticulo: 'Agregar artículo',
                 sinArticulos: 'No hay artículos en la lista',
                 editar: 'Editar',
@@ -2323,8 +2411,8 @@
                 subtotal: 'Subtotal:',
                 descuentos: 'Discounts:',
                 total: 'Total:',
-                guardarLista: '💾 Save list',
-                limpiarTodo: '🗑️ Clear all',
+                guardarLista: 'Save list',
+                limpiarTodo: 'Clear all',
                 agregarArticulo: 'Add item',
                 sinArticulos: 'No items in the list',
                 editar: 'Edit',
@@ -2362,6 +2450,15 @@
             temaActual = temaActual === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', temaActual);
             localStorage.setItem('tema', temaActual);
+            
+            // Re-renderizar gráficos con nuevos colores
+            if (document.getElementById('seccionGraficos').classList.contains('active')) {
+                const activeTab = document.querySelector('.gastos-tab.active');
+                if (activeTab) {
+                    const tabData = activeTab.getAttribute('data-tab');
+                    cambiarTabGastos(tabData);
+                }
+            }
         }
 
         function navigateTo(seccion) {
@@ -2595,52 +2692,67 @@
         function generarHTMLProducto(prod, index) {
             const comprado = prod.comprado || false;
             const claseComprado = comprado ? 'item-comprado' : '';
-            
-            // Construir info inline
-            let infoInline = `${prod.cantidad} ${prod.unidad}`;
-            if (mostrarCampos.marca && prod.marca) infoInline += ` • ${prod.marca}`;
-            if (prod.tienePromo) {
-                const promoText = prod.tipoPromo === 'promocion' ? prod.descripcionPromo : `${prod.valorDescuento}% OFF`;
-                infoInline += ` • 🎁 ${promoText}`;
-            }
+            const trad = traducciones[idioma];
             
             return `
                 <div class="item-card ${claseComprado}" draggable="true" data-index="${index}">
-                    <div class="item-checkbox">
-                        <input type="checkbox" ${comprado ? 'checked' : ''} onchange="toggleComprado(${index})" class="checkbox-compra">
-                    </div>
-                    
-                    <div class="item-header">
-                        <div class="item-emoji">${categoriaEmojis[prod.categoria] || '📦'}</div>
-                        <div class="item-info">
-                            <div class="item-name">${prod.nombre}</div>
-                            <div class="item-detail-badge">${infoInline}</div>
+                    <!-- Línea 1: Nombre, Precio y Checkbox -->
+                    <div class="item-row-1">
+                        <div class="item-name">${prod.nombre}</div>
+                        <div class="item-right-1">
+                            <div class="item-price">${formatearPrecio(prod.total)}</div>
+                            <input type="checkbox" ${comprado ? 'checked' : ''} onchange="toggleComprado(${index})" class="checkbox-compra">
                         </div>
                     </div>
                     
-                    <div class="item-footer">
-                        <div class="item-price">${formatearPrecio(prod.total)}</div>
+                    <!-- Línea 2: Unidades, Marca y Categoría -->
+                    <div class="item-row-2">
+                        <span class="item-detail">${prod.cantidad} ${prod.unidad}</span>
+                        ${mostrarCampos.marca && prod.marca ? `<span class="item-detail">${prod.marca}</span>` : ''}
+                        ${mostrarCampos.categoria && prod.categoria ? `<span class="item-detail">${getCategoriaTexto(prod.categoria)}</span>` : ''}
                     </div>
                     
-                    <div class="item-actions">
-                        <button class="item-btn-icon" onclick="event.stopPropagation(); abrirModalEditar(${index})">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="item-btn-icon" onclick="event.stopPropagation(); confirmarEliminar(${index})">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
+                    <!-- Línea 3: Promoción y Nota -->
+                    ${(prod.tienePromo || (mostrarCampos.nota && prod.nota)) ? `
+                        <div class="item-row-3">
+                            ${prod.tienePromo ? `
+                                <div class="item-promo">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 6H16V4C16 2.89 15.11 2 14 2H10C8.89 2 8 2.89 8 4V6H4C2.89 6 2.01 6.89 2.01 8L2 19C2 20.11 2.89 21 4 21H20C21.11 21 22 20.11 22 19V8C22 6.89 21.11 6 20 6ZM10 4H14V6H10V4ZM12 17L7 12H10V9H14V12H17L12 17Z" fill="currentColor"/>
+                                    </svg>
+                                    <span>${prod.tipoPromo === 'promocion' ? prod.descripcionPromo : prod.valorDescuento + '% OFF'}</span>
+                                </div>
+                            ` : ''}
+                            ${mostrarCampos.nota && prod.nota ? `
+                                <div class="item-nota">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM16 18H8V16H16V18ZM16 14H8V12H16V14ZM13 9V3.5L18.5 9H13Z" fill="currentColor"/>
+                                    </svg>
+                                    <span>${prod.nota}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
                     
-                    <div class="item-drag-handle">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 5h2v2H9V5zm0 6h2v2H9v-2zm0 6h2v2H9v-2zm6-12h2v2h-2V5zm0 6h2v2h-2v-2zm0 6h2v2h-2v-2z"/>
-                        </svg>
+                    <!-- Línea 4: Botones (Editar, Eliminar, Mover) -->
+                    <div class="item-row-4">
+                        <button class="item-btn-icon" onclick="event.stopPropagation(); abrirModalEditar(${index})" title="${trad.editar}" ${comprado ? 'disabled' : ''}>
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="item-btn-icon" onclick="event.stopPropagation(); confirmarEliminar(${index})" title="${trad.eliminar}" ${comprado ? 'disabled' : ''}>
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H5H21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="item-btn-icon item-btn-drag" title="Mover" ${comprado ? 'disabled' : ''}>
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5h2v2H9V5zm0 6h2v2H9v-2zm0 6h2v2H9v-2zm6-12h2v2h-2V5zm0 6h2v2h-2v-2zm0 6h2v2h-2v-2z"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             `;
@@ -2667,18 +2779,21 @@
             const listaActualizada = document.getElementById('listaCompras');
             
             listaActualizada.addEventListener('dragstart', function(e) {
-                if (e.target.classList.contains('item-card')) {
-                    draggedElement = e.target;
-                    draggedIndex = parseInt(e.target.dataset.index);
-                    e.target.classList.add('dragging');
+                // Buscar el item-card más cercano
+                const itemCard = e.target.closest('.item-card');
+                if (itemCard) {
+                    draggedElement = itemCard;
+                    draggedIndex = parseInt(itemCard.dataset.index);
+                    itemCard.classList.add('dragging');
                     e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/html', e.target.innerHTML);
+                    e.dataTransfer.setData('text/html', itemCard.innerHTML);
                 }
             });
             
             listaActualizada.addEventListener('dragend', function(e) {
-                if (e.target.classList.contains('item-card')) {
-                    e.target.classList.remove('dragging');
+                const itemCard = e.target.closest('.item-card');
+                if (itemCard) {
+                    itemCard.classList.remove('dragging');
                 }
             });
             
@@ -2691,10 +2806,24 @@
                 
                 const afterElement = getDragAfterElement(listaActualizada, e.clientY);
                 
-                if (afterElement == null) {
-                    listaActualizada.appendChild(dragging);
-                } else {
-                    listaActualizada.insertBefore(dragging, afterElement);
+                // Solo intentar mover si afterElement es un elemento válido o null
+                if (!afterElement || afterElement === null) {
+                    // Agregar al final
+                    const lastCard = listaActualizada.querySelector('.item-card:last-child');
+                    if (lastCard && lastCard !== dragging) {
+                        try {
+                            listaActualizada.appendChild(dragging);
+                        } catch (err) {
+                            console.warn('Error moving element:', err);
+                        }
+                    }
+                } else if (afterElement && afterElement !== dragging && afterElement.parentNode === listaActualizada) {
+                    // Insertar antes del elemento
+                    try {
+                        listaActualizada.insertBefore(dragging, afterElement);
+                    } catch (err) {
+                        console.warn('Error moving element:', err);
+                    }
                 }
             });
             
@@ -2742,7 +2871,11 @@
         function getDragAfterElement(container, y) {
             const draggableElements = [...container.querySelectorAll('.item-card:not(.dragging)')];
             
-            return draggableElements.reduce((closest, child) => {
+            if (draggableElements.length === 0) {
+                return null;
+            }
+            
+            const result = draggableElements.reduce((closest, child) => {
                 const box = child.getBoundingClientRect();
                 const offset = y - box.top - box.height / 2;
                 
@@ -2751,7 +2884,9 @@
                 } else {
                     return closest;
                 }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }, { offset: Number.NEGATIVE_INFINITY, element: null });
+            
+            return result.element;
         }
         
         function getCategoriaTexto(categoria) {
@@ -3180,9 +3315,19 @@
             }
         }
         
+        // Helper para obtener colores según el tema actual
+        function getChartColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            return {
+                textColor: isDark ? '#ffffff' : '#1a1a1a',
+                gridColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(26, 26, 26, 0.1)'
+            };
+        }
+        
         // 1. Top 5 Artículos
         function renderizarTopArticulos() {
             destruirGrafico('chartTopArticulos');
+            const colors = getChartColors();
             
             if (productos.length === 0) {
                 document.getElementById('statsTopArticulos').innerHTML = '<div class="empty-state-text">No hay productos para mostrar</div>';
@@ -3213,11 +3358,11 @@
                     },
                     scales: {
                         x: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            ticks: { color: colors.textColor },
+                            grid: { color: colors.gridColor }
                         },
                         y: {
-                            ticks: { color: '#ffffff' },
+                            ticks: { color: colors.textColor },
                             grid: { display: false }
                         }
                     }
@@ -3238,6 +3383,7 @@
         // 2. Gastos por Categoría
         function renderizarPorCategoria() {
             destruirGrafico('chartCategorias');
+            const colors = getChartColors();
             
             if (productos.length === 0) {
                 document.getElementById('statsCategorias').innerHTML = '<div class="empty-state-text">No hay productos para mostrar</div>';
@@ -3265,7 +3411,7 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#ffffff', padding: 15 }
+                            labels: { color: colors.textColor, padding: 15 }
                         }
                     }
                 }
@@ -3287,6 +3433,7 @@
         // 3. Impacto de Descuentos
         function renderizarDescuentos() {
             destruirGrafico('chartDescuentos');
+            const colors = getChartColors();
             
             const productosConPromo = productos.filter(p => p.tienePromo && p.tipoPromo === 'descuento');
             const totalAhorrado = productosConPromo.reduce((sum, p) => {
@@ -3334,11 +3481,11 @@
                         y: {
                             beginAtZero: true,
                             max: 100,
-                            ticks: { color: '#ffffff', callback: (value) => value + '%' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            ticks: { color: colors.textColor, callback: (value) => value + '%' },
+                            grid: { color: colors.gridColor }
                         },
                         x: {
-                            ticks: { color: '#ffffff' },
+                            ticks: { color: colors.textColor },
                             grid: { display: false }
                         }
                     }
@@ -3349,6 +3496,7 @@
         // 4. Comparación con Listas Anteriores
         function renderizarComparacion() {
             destruirGrafico('chartComparacion');
+            const colors = getChartColors();
             
             const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
             const listasArray = Object.entries(listas)
@@ -3382,16 +3530,16 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: { labels: { color: '#ffffff' } }
+                        legend: { labels: { color: colors.textColor } }
                     },
                     scales: {
                         y: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            ticks: { color: colors.textColor },
+                            grid: { color: colors.gridColor }
                         },
                         x: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            ticks: { color: colors.textColor },
+                            grid: { color: colors.gridColor }
                         }
                     }
                 }
@@ -3512,7 +3660,26 @@
         }
 
         function aplicarTraducciones() {
-            // Aplicar traducciones a elementos visibles
+            const trad = traducciones[idioma];
+            
+            // Traducir botones Guardar y Limpiar
+            document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
+                if (index === 0) btn.innerHTML = `<svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21V13H7V21M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${trad.guardarLista}`;
+                else if (index === 1) btn.innerHTML = `<svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${trad.limpiarTodo}`;
+            });
+            
+            // Traducir botón agregar artículo
+            const btnAgregar = document.querySelector('.btn-add-item');
+            if (btnAgregar) btnAgregar.innerHTML = `<svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>${trad.agregarArticulo}`;
+            
+            // Traducir títulos de botones editar y eliminar
+            document.querySelectorAll('.item-btn-icon').forEach((btn, index) => {
+                const mod = index % 3;
+                if (mod === 0) btn.setAttribute('title', trad.editar);
+                else if (mod === 1) btn.setAttribute('title', trad.eliminar);
+            });
+            
+            // Re-renderizar productos
             renderizarProductos();
             actualizarTotales();
         }
@@ -3647,9 +3814,14 @@
                 btnAplicar.id = 'btnAplicarCambios';
                 btnAplicar.className = 'btn-aplicar-container';
                 btnAplicar.innerHTML = `
-                    <button class="btn btn-primary" onclick="confirmarAplicarCambios()">
-                        Aplicar Cambios
-                    </button>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="confirmarAplicarCambios()">
+                            Aplicar Cambios
+                        </button>
+                        <button class="btn btn-secondary" onclick="cancelarCambios()">
+                            Cancelar
+                        </button>
+                    </div>
                 `;
                 configContainer.appendChild(btnAplicar);
             }
@@ -3698,6 +3870,25 @@
                     if (btnAplicar) btnAplicar.style.display = 'none';
                 }
             );
+        }
+        
+        function cancelarCambios() {
+            // Restaurar valores
+            mostrarCamposTemp = {...mostrarCampos};
+            mostrarDecimalesTemp = mostrarDecimales;
+            idiomaTemp = idioma;
+            
+            // Restaurar checkboxes
+            document.getElementById('checkMarca').checked = mostrarCampos.marca;
+            document.getElementById('checkCategoria').checked = mostrarCampos.categoria;
+            document.getElementById('checkNota').checked = mostrarCampos.nota;
+            document.getElementById('checkPromociones').checked = mostrarCampos.promociones;
+            document.getElementById('checkDecimales').checked = mostrarDecimales;
+            document.getElementById('selectIdioma').value = idioma;
+            
+            // Ocultar botón
+            const btnAplicar = document.getElementById('btnAplicarCambios');
+            if (btnAplicar) btnAplicar.style.display = 'none';
         }
 
         // Formateo de precio
