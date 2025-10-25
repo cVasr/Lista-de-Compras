@@ -6,6 +6,7 @@
     <title>Calculadora de Compras</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1504,11 +1505,13 @@
         
         .resumen-summary-row.total {
             border-top: 2px solid #1a1a1a;
-            padding-top: 12px;
+            padding: 12px;
             margin-top: 8px;
             font-size: 20px;
             font-weight: 700;
             color: #39ff14;
+            background: #0f0f0f;
+            border-radius: 8px;
         }
         
         .resumen-actions {
@@ -2423,12 +2426,18 @@
             
             <div class="resumen-actions">
                 <button class="btn btn-secondary" onclick="cerrarResumen()">Cerrar</button>
+                <button class="btn btn-secondary" onclick="compartirResumen()" title="Compartir en redes sociales o apps">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 12V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V12M12 4V16M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Compartir
+                </button>
                 <button class="btn btn-primary" onclick="descargarResumen()">
                     <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    Descargar
+                    Descargar PDF
                 </button>
             </div>
         </div>
@@ -3482,37 +3491,292 @@
         }
         
         function descargarResumen() {
-            const container = document.getElementById('resumenContainer');
+            // Obtener datos
+            const titulo = document.getElementById('resumenTitulo').textContent;
+            const fecha = document.getElementById('resumenFecha').textContent;
+            const itemsHTML = document.getElementById('resumenItems').innerHTML;
+            const summaryHTML = document.getElementById('resumenSummary').innerHTML;
             
-            // Guardar scroll actual
-            const itemsContainer = document.getElementById('resumenItems');
-            const scrollPos = itemsContainer.scrollTop;
+            // Crear PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
             
-            // Temporalmente hacer que el contenedor muestre todo el contenido
-            itemsContainer.style.maxHeight = 'none';
-            itemsContainer.style.overflow = 'visible';
+            // Colores
+            const colorPrimario = '#39ff14';
+            const colorTexto = '#000000';
+            const colorFondo = '#f5f5f5';
             
-            html2canvas(container, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                scrollY: -window.scrollY,
-                scrollX: -window.scrollX,
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight,
-                useCORS: true
-            }).then(canvas => {
-                // Restaurar scroll y estilos
-                itemsContainer.style.maxHeight = '';
-                itemsContainer.style.overflow = '';
-                itemsContainer.scrollTop = scrollPos;
+            let yPosition = 20;
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const margen = 15;
+            const anchoUtil = pageWidth - (2 * margen);
+            
+            // Título
+            doc.setFontSize(18);
+            doc.setTextColor(57, 255, 20); // Color primario
+            doc.text(titulo, pageWidth / 2, yPosition, { align: 'center' });
+            
+            // Fecha
+            yPosition += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(128, 128, 128);
+            doc.text(fecha, pageWidth / 2, yPosition, { align: 'center' });
+            
+            // Línea divisoria
+            yPosition += 8;
+            doc.setDrawColor(57, 255, 20);
+            doc.line(margen, yPosition, pageWidth - margen, yPosition);
+            
+            // Títulos de columnas
+            yPosition += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'bold');
+            
+            const colAncho = anchoUtil / 3;
+            doc.text('Producto', margen + 5, yPosition);
+            doc.text('Cantidad', margen + colAncho + 5, yPosition);
+            doc.text('Precio', margen + (colAncho * 2) + 5, yPosition);
+            
+            // Línea bajo encabezado
+            yPosition += 2;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margen, yPosition, pageWidth - margen, yPosition);
+            
+            // Agregar ítems
+            yPosition += 8;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            
+            // Procesar items del HTML
+            const itemsContainer = document.querySelector('#resumenItems');
+            const items = itemsContainer.querySelectorAll('.resumen-item');
+            
+            items.forEach((item, index) => {
+                // Verificar si necesitamos una nueva página
+                if (yPosition > pageHeight - 50) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
                 
-                // Descargar imagen
-                const link = document.createElement('a');
-                const fecha = new Date().toISOString().split('T')[0];
-                link.download = `lista-compras-${fecha}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
+                const cantidad = item.querySelector('.resumen-item-details')?.textContent || '';
+                const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
+                
+                // Mostrar nombre en negrita
+                doc.setFont(undefined, 'bold');
+                doc.text(nombre.substring(0, 30), margen + 5, yPosition);
+                
+                // Mostrar cantidad y precio en normal
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(128, 128, 128);
+                doc.text(cantidad, margen + colAncho + 5, yPosition + 3);
+                doc.text(precio, margen + (colAncho * 2) + 5, yPosition + 3, { align: 'right' });
+                
+                yPosition += 7;
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
             });
+            
+            // Línea divisoria antes de resumen
+            yPosition += 5;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margen, yPosition, pageWidth - margen, yPosition);
+            
+            // Resumen (Subtotal, Descuentos, Total)
+            yPosition += 8;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            // Obtener valores del resumen
+            const summaryContainer = document.querySelector('#resumenSummary');
+            const rows = summaryContainer.querySelectorAll('.resumen-summary-row');
+            
+            rows.forEach((row, index) => {
+                const isTotal = row.classList.contains('total');
+                const cells = row.querySelectorAll('span');
+                const label = cells[0]?.textContent || '';
+                const value = cells[1]?.textContent || '';
+                
+                if (isTotal) {
+                    doc.setFont(undefined, 'bold');
+                    doc.setFontSize(12);
+                    doc.setTextColor(57, 255, 20); // Color primario para total
+                    // Rectángulo de fondo para total
+                    doc.setFillColor(240, 240, 240);
+                    doc.rect(margen, yPosition - 5, anchoUtil, 8, 'F');
+                } else {
+                    doc.setFont(undefined, 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                }
+                
+                doc.text(label, margen + 5, yPosition);
+                doc.text(value, pageWidth - margen - 5, yPosition, { align: 'right' });
+                yPosition += 7;
+            });
+            
+            // Pie de página
+            yPosition = pageHeight - 15;
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text('Generado por: Calculadora de Compras', pageWidth / 2, yPosition, { align: 'center' });
+            doc.text('Este comprobante puede ser compartido en cualquier plataforma', pageWidth / 2, yPosition + 5, { align: 'center' });
+            
+            // Descargar PDF
+            const fecha_descarga = new Date().toISOString().split('T')[0];
+            doc.save(`lista-compras-${fecha_descarga}.pdf`);
+        }
+        
+        // Función para compartir PDF (usando Web Share API si está disponible)
+        function compartirResumen() {
+            const titulo = document.getElementById('resumenTitulo').textContent;
+            const fecha = document.getElementById('resumenFecha').textContent;
+            
+            // Crear el PDF en memoria
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Colores
+            const colorPrimario = '#39ff14';
+            const colorTexto = '#000000';
+            
+            let yPosition = 20;
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const margen = 15;
+            const anchoUtil = pageWidth - (2 * margen);
+            
+            // Título
+            doc.setFontSize(18);
+            doc.setTextColor(57, 255, 20);
+            doc.text(titulo, pageWidth / 2, yPosition, { align: 'center' });
+            
+            // Fecha
+            yPosition += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(128, 128, 128);
+            doc.text(fecha, pageWidth / 2, yPosition, { align: 'center' });
+            
+            // Línea divisoria
+            yPosition += 8;
+            doc.setDrawColor(57, 255, 20);
+            doc.line(margen, yPosition, pageWidth - margen, yPosition);
+            
+            // Títulos de columnas
+            yPosition += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'bold');
+            
+            const colAncho = anchoUtil / 3;
+            doc.text('Producto', margen + 5, yPosition);
+            doc.text('Cantidad', margen + colAncho + 5, yPosition);
+            doc.text('Precio', margen + (colAncho * 2) + 5, yPosition);
+            
+            // Línea bajo encabezado
+            yPosition += 2;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margen, yPosition, pageWidth - margen, yPosition);
+            
+            // Agregar ítems
+            yPosition += 8;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            
+            const itemsContainer = document.querySelector('#resumenItems');
+            const items = itemsContainer.querySelectorAll('.resumen-item');
+            
+            items.forEach((item) => {
+                if (yPosition > pageHeight - 50) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
+                const cantidad = item.querySelector('.resumen-item-details')?.textContent || '';
+                const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
+                
+                doc.setFont(undefined, 'bold');
+                doc.text(nombre.substring(0, 30), margen + 5, yPosition);
+                
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(128, 128, 128);
+                doc.text(cantidad, margen + colAncho + 5, yPosition + 3);
+                doc.text(precio, margen + (colAncho * 2) + 5, yPosition + 3, { align: 'right' });
+                
+                yPosition += 7;
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
+            });
+            
+            // Línea divisoria antes de resumen
+            yPosition += 5;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margen, yPosition, pageWidth - margen, yPosition);
+            
+            // Resumen
+            yPosition += 8;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            const summaryContainer = document.querySelector('#resumenSummary');
+            const rows = summaryContainer.querySelectorAll('.resumen-summary-row');
+            
+            rows.forEach((row) => {
+                const isTotal = row.classList.contains('total');
+                const cells = row.querySelectorAll('span');
+                const label = cells[0]?.textContent || '';
+                const value = cells[1]?.textContent || '';
+                
+                if (isTotal) {
+                    doc.setFont(undefined, 'bold');
+                    doc.setFontSize(12);
+                    doc.setTextColor(57, 255, 20);
+                    doc.setFillColor(240, 240, 240);
+                    doc.rect(margen, yPosition - 5, anchoUtil, 8, 'F');
+                } else {
+                    doc.setFont(undefined, 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                }
+                
+                doc.text(label, margen + 5, yPosition);
+                doc.text(value, pageWidth - margen - 5, yPosition, { align: 'right' });
+                yPosition += 7;
+            });
+            
+            // Pie de página
+            yPosition = pageHeight - 15;
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text('Generado por: Calculadora de Compras', pageWidth / 2, yPosition, { align: 'center' });
+            doc.text('Este comprobante puede ser compartido en cualquier plataforma', pageWidth / 2, yPosition + 5, { align: 'center' });
+            
+            // Convertir a blob y compartir
+            const blob = doc.output('blob');
+            const fecha_descarga = new Date().toISOString().split('T')[0];
+            const fileName = `lista-compras-${fecha_descarga}.pdf`;
+            
+            // Usar Web Share API si está disponible
+            if (navigator.share) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                navigator.share({
+                    title: 'Mi lista de compras',
+                    text: `Compartiendo mi lista de compras del ${fecha_descarga}`,
+                    files: [file]
+                }).catch(err => console.log('Error al compartir:', err));
+            } else {
+                // Fallback: descargar si Web Share API no está disponible
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
         }
 
         // Gráficos
