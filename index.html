@@ -3514,7 +3514,7 @@
             
             // Título
             doc.setFontSize(18);
-            doc.setTextColor(57, 255, 20); // Color primario
+            doc.setTextColor(0, 0, 0); // Negro
             doc.text(titulo, pageWidth / 2, yPosition, { align: 'center' });
             
             // Fecha
@@ -3536,8 +3536,8 @@
             
             const colAncho = anchoUtil / 3;
             doc.text('Producto', margen + 5, yPosition);
-            doc.text('Cantidad', margen + colAncho + 5, yPosition);
-            doc.text('Precio', margen + (colAncho * 2) + 5, yPosition);
+            doc.text('Cantidad', margen + colAncho + 5, yPosition, { align: 'right' });
+            doc.text('Precio', pageWidth - margen - 5, yPosition, { align: 'right' });
             
             // Línea bajo encabezado
             yPosition += 2;
@@ -3568,12 +3568,12 @@
                 doc.setFont(undefined, 'bold');
                 doc.text(nombre.substring(0, 30), margen + 5, yPosition);
                 
-                // Mostrar cantidad y precio en normal
+                // Mostrar cantidad y precio en normal, alineados a la derecha
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(128, 128, 128);
-                doc.text(cantidad, margen + colAncho + 5, yPosition + 3);
-                doc.text(precio, margen + (colAncho * 2) + 5, yPosition + 3, { align: 'right' });
+                doc.text(cantidad, margen + colAncho + 5, yPosition + 3, { align: 'right' });
+                doc.text(precio, pageWidth - margen - 5, yPosition + 3, { align: 'right' });
                 
                 yPosition += 7;
                 doc.setFontSize(9);
@@ -3603,9 +3603,9 @@
                 if (isTotal) {
                     doc.setFont(undefined, 'bold');
                     doc.setFontSize(12);
-                    doc.setTextColor(57, 255, 20); // Color primario para total
-                    // Rectángulo de fondo para total
-                    doc.setFillColor(240, 240, 240);
+                    doc.setTextColor(255, 255, 255); // Texto blanco
+                    // Rectángulo de fondo NEGRO para total
+                    doc.setFillColor(0, 0, 0); // Negro
                     doc.rect(margen, yPosition - 5, anchoUtil, 8, 'F');
                 } else {
                     doc.setFont(undefined, 'normal');
@@ -3651,7 +3651,7 @@
             
             // Título
             doc.setFontSize(18);
-            doc.setTextColor(57, 255, 20);
+            doc.setTextColor(0, 0, 0); // Negro
             doc.text(titulo, pageWidth / 2, yPosition, { align: 'center' });
             
             // Fecha
@@ -3673,8 +3673,8 @@
             
             const colAncho = anchoUtil / 3;
             doc.text('Producto', margen + 5, yPosition);
-            doc.text('Cantidad', margen + colAncho + 5, yPosition);
-            doc.text('Precio', margen + (colAncho * 2) + 5, yPosition);
+            doc.text('Cantidad', margen + colAncho + 5, yPosition, { align: 'right' });
+            doc.text('Precio', pageWidth - margen - 5, yPosition, { align: 'right' });
             
             // Línea bajo encabezado
             yPosition += 2;
@@ -3705,8 +3705,8 @@
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(128, 128, 128);
-                doc.text(cantidad, margen + colAncho + 5, yPosition + 3);
-                doc.text(precio, margen + (colAncho * 2) + 5, yPosition + 3, { align: 'right' });
+                doc.text(cantidad, margen + colAncho + 5, yPosition + 3, { align: 'right' });
+                doc.text(precio, pageWidth - margen - 5, yPosition + 3, { align: 'right' });
                 
                 yPosition += 7;
                 doc.setFontSize(9);
@@ -3735,8 +3735,8 @@
                 if (isTotal) {
                     doc.setFont(undefined, 'bold');
                     doc.setFontSize(12);
-                    doc.setTextColor(57, 255, 20);
-                    doc.setFillColor(240, 240, 240);
+                    doc.setTextColor(255, 255, 255); // Texto blanco
+                    doc.setFillColor(0, 0, 0); // Fondo negro
                     doc.rect(margen, yPosition - 5, anchoUtil, 8, 'F');
                 } else {
                     doc.setFont(undefined, 'normal');
