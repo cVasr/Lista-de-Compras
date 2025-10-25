@@ -30,6 +30,7 @@
             --text-secondary: #e0e0e0;
             --text-muted: #808080;
             --bottom-fixed-height: 0px;
+            --footer-height: 0px;
         }
         
         [data-theme="light"] {
@@ -345,6 +346,7 @@
             overflow-y: hidden !important;
             overflow-x: hidden !important;
             gap: 0;
+            padding-bottom: var(--footer-height);
         }
         
         /* Otras secciones - scroll y padding consistente */
@@ -402,7 +404,7 @@
             min-height: 0;
             scrollbar-gutter: stable;
             padding: 0 16px;
-            padding-bottom: 200px;
+            padding-bottom: 20px;
         }
         
         /* Ocultar scrollbar */
@@ -2553,8 +2555,10 @@
             if (bottomFixedContainer && bottomFixedContainer.classList.contains('visible')) {
                 const altura = bottomFixedContainer.offsetHeight;
                 document.documentElement.style.setProperty('--bottom-fixed-height', altura + 'px');
+                document.documentElement.style.setProperty('--footer-height', altura + 'px');
             } else {
                 document.documentElement.style.setProperty('--bottom-fixed-height', '0px');
+                document.documentElement.style.setProperty('--footer-height', '0px');
             }
         }
 
