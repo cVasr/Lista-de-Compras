@@ -1011,7 +1011,6 @@
             animation: fadeIn 0.3s ease;
         }
         
-
         .modal-header {
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
@@ -2807,7 +2806,7 @@
             const nombre = document.getElementById('nombreProducto').value.trim();
             
             if (!nombre) {
-                alert('El nombre del producto es obligatorio');
+                
                 return;
             }
 
@@ -3229,7 +3228,7 @@
         // Guardar lista
         function guardarLista() {
             if (productos.length === 0) {
-                alert('No hay artículos para guardar');
+                
                 return;
             }
             document.getElementById('modalGuardar').classList.add('active');
@@ -3246,7 +3245,7 @@
             const nombreLista = document.getElementById('nombreLista').value.trim();
             
             if (!nombreLista) {
-                alert('El nombre de la lista es obligatorio');
+                
                 return;
             }
 
@@ -3262,7 +3261,7 @@
 
             localStorage.setItem('listasGuardadas', JSON.stringify(listas));
             cerrarModalGuardar();
-            alert('Lista guardada exitosamente');
+            
         }
         
         // Presupuesto
@@ -3436,7 +3435,6 @@
                         });
                         document.querySelector('.menu-item').classList.add('active');
                         
-                        alert('Lista cargada exitosamente');
                     }
                 }
             );
@@ -4438,7 +4436,6 @@
                     const btnAplicar = document.getElementById('btnAplicarCambios');
                     if (btnAplicar) btnAplicar.style.display = 'none';
                     
-                    alert('Cambios aplicados exitosamente');
                 },
                 () => {
                     // Cancelar - restaurar valores
