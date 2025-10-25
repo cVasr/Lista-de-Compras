@@ -1424,6 +1424,38 @@
             text-align: center;
             border-bottom: 2px solid #e0e0e0;
             background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+        }
+        
+        .resumen-header-content {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .resumen-close-btn {
+            background: transparent;
+            border: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666666;
+            font-size: 24px;
+            padding: 0;
+            transition: color 0.3s;
+        }
+        
+        .resumen-close-btn:hover {
+            color: #000000;
+        }
+        
+        .resumen-close-btn:active {
+            transform: scale(0.95);
         }
         
         .resumen-title {
@@ -1446,18 +1478,23 @@
         }
         
         .resumen-item {
-            padding: 16px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            padding: 16px 0;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto;
+            gap: 2px 12px;
+            align-items: start;
+            border-bottom: 2px solid #e0e0e0;
         }
         
         .resumen-item:last-child {
             border-bottom: none;
+            padding-bottom: 0;
         }
         
         .resumen-item-info {
+            grid-column: 1;
+            grid-row: 1 / 3;
             flex: 1;
         }
         
@@ -1465,20 +1502,25 @@
             font-weight: 700;
             font-size: 16px;
             color: #1a1a1a;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         
         .resumen-item-details {
             font-size: 13px;
             color: #666666;
+            margin-top: 0;
+            line-height: 1.4;
         }
         
         .resumen-item-price {
+            grid-column: 2;
+            grid-row: 1;
             font-weight: 700;
             font-size: 16px;
             color: #1a1a1a;
             white-space: nowrap;
-            margin-left: 12px;
+            margin-left: 0;
+            text-align: right;
         }
         
         .resumen-summary {
@@ -2416,8 +2458,11 @@
     <div class="modal-resumen" id="modalResumen">
         <div class="resumen-container" id="resumenContainer">
             <div class="resumen-header">
-                <div class="resumen-title" id="resumenTitulo">Lista de Compras</div>
-                <div class="resumen-date" id="resumenFecha"></div>
+                <div class="resumen-header-content">
+                    <div class="resumen-title" id="resumenTitulo">Lista de Compras</div>
+                    <div class="resumen-date" id="resumenFecha"></div>
+                </div>
+                <button class="resumen-close-btn" onclick="cerrarResumen()" title="Cerrar">×</button>
             </div>
             
             <div class="resumen-items" id="resumenItems"></div>
@@ -2425,7 +2470,6 @@
             <div class="resumen-summary" id="resumenSummary"></div>
             
             <div class="resumen-actions">
-                <button class="btn btn-secondary" onclick="cerrarResumen()">Cerrar</button>
                 <button class="btn btn-secondary" onclick="compartirResumen()" title="Compartir en redes sociales o apps">
                     <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 12V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V12M12 4V16M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -3446,8 +3490,8 @@
                     <div class="resumen-item-info">
                         <div class="resumen-item-name">${prod.nombre}</div>
                         <div class="resumen-item-details">
-                            ${prod.marca ? prod.marca + ' • ' : ''}${prod.cantidad} ${prod.unidad}
-                            ${prod.tienePromo ? ' • ' + (prod.tipoPromo === 'promocion' ? prod.descripcionPromo : prod.valorDescuento + '% OFF') : ''}
+                            Cantidad: ${prod.cantidad} ${prod.unidad}
+                            ${prod.marca ? '<br>' + prod.marca : ''}${prod.tienePromo ? '<br>' + (prod.tipoPromo === 'promocion' ? prod.descripcionPromo : prod.valorDescuento + '% OFF') : ''}
                         </div>
                     </div>
                     <div class="resumen-item-price">${formatearPrecio(prod.total)}</div>
@@ -3528,15 +3572,13 @@
             doc.setDrawColor(57, 255, 20);
             doc.line(margen, yPosition, pageWidth - margen, yPosition);
             
-            // Títulos de columnas
+            // Títulos de columnas - solo Producto y Precio
             yPosition += 10;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
             doc.setFont(undefined, 'bold');
             
-            const colAncho = anchoUtil / 3;
             doc.text('Producto', margen + 5, yPosition);
-            doc.text('Cantidad', margen + colAncho + 5, yPosition, { align: 'right' });
             doc.text('Precio', pageWidth - margen - 5, yPosition, { align: 'right' });
             
             // Línea bajo encabezado
@@ -3561,21 +3603,34 @@
                 }
                 
                 const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
-                const cantidad = item.querySelector('.resumen-item-details')?.textContent || '';
+                const detalles = item.querySelector('.resumen-item-details')?.textContent || '';
                 const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
                 
                 // Mostrar nombre en negrita
                 doc.setFont(undefined, 'bold');
-                doc.text(nombre.substring(0, 30), margen + 5, yPosition);
+                doc.setFontSize(9);
+                doc.text(nombre.substring(0, 35), margen + 5, yPosition);
+                doc.text(precio, pageWidth - margen - 5, yPosition, { align: 'right' });
                 
-                // Mostrar cantidad y precio en normal, alineados a la derecha
+                // Mostrar detalles (cantidad, marca, etc.) debajo en gris
+                yPosition += 5;
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(128, 128, 128);
-                doc.text(cantidad, margen + colAncho + 5, yPosition + 3, { align: 'right' });
-                doc.text(precio, pageWidth - margen - 5, yPosition + 3, { align: 'right' });
                 
-                yPosition += 7;
+                // Dividir detalles por líneas si contiene saltos de línea
+                const lineasDetalles = detalles.split('\n').filter(l => l.trim());
+                lineasDetalles.forEach((linea, idx) => {
+                    doc.text(linea.substring(0, 40), margen + 8, yPosition);
+                    yPosition += 3;
+                });
+                
+                // Línea separadora entre productos
+                yPosition += 3;
+                doc.setDrawColor(220, 220, 220);
+                doc.line(margen, yPosition, pageWidth - margen, yPosition);
+                
+                yPosition += 4;
                 doc.setFontSize(9);
                 doc.setTextColor(0, 0, 0);
             });
@@ -3603,7 +3658,7 @@
                 if (isTotal) {
                     doc.setFont(undefined, 'bold');
                     doc.setFontSize(12);
-                    doc.setTextColor(255, 255, 255); // Texto blanco
+                    doc.setTextColor(57, 255, 20); // Verde característico
                     // Rectángulo de fondo NEGRO para total
                     doc.setFillColor(0, 0, 0); // Negro
                     doc.rect(margen, yPosition - 5, anchoUtil, 8, 'F');
@@ -3665,15 +3720,13 @@
             doc.setDrawColor(57, 255, 20);
             doc.line(margen, yPosition, pageWidth - margen, yPosition);
             
-            // Títulos de columnas
+            // Títulos de columnas - solo Producto y Precio
             yPosition += 10;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
             doc.setFont(undefined, 'bold');
             
-            const colAncho = anchoUtil / 3;
             doc.text('Producto', margen + 5, yPosition);
-            doc.text('Cantidad', margen + colAncho + 5, yPosition, { align: 'right' });
             doc.text('Precio', pageWidth - margen - 5, yPosition, { align: 'right' });
             
             // Línea bajo encabezado
@@ -3696,19 +3749,34 @@
                 }
                 
                 const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
-                const cantidad = item.querySelector('.resumen-item-details')?.textContent || '';
+                const detalles = item.querySelector('.resumen-item-details')?.textContent || '';
                 const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
                 
+                // Mostrar nombre en negrita
                 doc.setFont(undefined, 'bold');
-                doc.text(nombre.substring(0, 30), margen + 5, yPosition);
+                doc.setFontSize(9);
+                doc.text(nombre.substring(0, 35), margen + 5, yPosition);
+                doc.text(precio, pageWidth - margen - 5, yPosition, { align: 'right' });
                 
+                // Mostrar detalles (cantidad, marca, etc.) debajo en gris
+                yPosition += 5;
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(128, 128, 128);
-                doc.text(cantidad, margen + colAncho + 5, yPosition + 3, { align: 'right' });
-                doc.text(precio, pageWidth - margen - 5, yPosition + 3, { align: 'right' });
                 
-                yPosition += 7;
+                // Dividir detalles por líneas si contiene saltos de línea
+                const lineasDetalles = detalles.split('\n').filter(l => l.trim());
+                lineasDetalles.forEach((linea, idx) => {
+                    doc.text(linea.substring(0, 40), margen + 8, yPosition);
+                    yPosition += 3;
+                });
+                
+                // Línea separadora entre productos
+                yPosition += 3;
+                doc.setDrawColor(220, 220, 220);
+                doc.line(margen, yPosition, pageWidth - margen, yPosition);
+                
+                yPosition += 4;
                 doc.setFontSize(9);
                 doc.setTextColor(0, 0, 0);
             });
@@ -3735,7 +3803,7 @@
                 if (isTotal) {
                     doc.setFont(undefined, 'bold');
                     doc.setFontSize(12);
-                    doc.setTextColor(255, 255, 255); // Texto blanco
+                    doc.setTextColor(57, 255, 20); // Verde característico
                     doc.setFillColor(0, 0, 0); // Fondo negro
                     doc.rect(margen, yPosition - 5, anchoUtil, 8, 'F');
                 } else {
