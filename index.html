@@ -503,8 +503,14 @@
         }
         
         .item-card.dragging {
-            opacity: 0.5;
+            opacity: 1;
             cursor: grabbing;
+            z-index: 10;
+        }
+        
+        /* Cuando hay dragging activo, los demás items bajan la transparencia */
+        .items-scroll-container.dragging-active .item-card:not(.dragging) {
+            opacity: 0.3;
         }
         
         /* Item comprado */
@@ -643,13 +649,13 @@
         }
         
         .item-btn-icon:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
+            background: var(--bg-input);
+            border-color: var(--border-color);
         }
         
         .item-btn-icon:disabled {
             cursor: not-allowed;
-            opacity: 0.4;
+            opacity: 1;
             background: var(--bg-input);
             border-color: var(--border-color);
         }
@@ -660,13 +666,13 @@
         }
         
         .item-btn-icon:disabled svg {
-            stroke: var(--text-muted);
-            fill: var(--text-muted);
+            stroke: var(--text-primary);
+            fill: var(--text-primary);
         }
         
         .item-btn-icon:disabled:hover svg {
-            stroke: var(--text-muted);
-            fill: var(--text-muted);
+            stroke: var(--text-primary);
+            fill: var(--text-primary);
         }
         
         .item-btn-icon svg {
@@ -678,8 +684,8 @@
         }
         
         .item-btn-icon:hover svg {
-            stroke: #000;
-            fill: #000;
+            stroke: var(--text-primary);
+            fill: none;
         }
         
         .item-btn-drag svg {
@@ -689,7 +695,7 @@
         
         .item-btn-icon:hover .item-btn-drag svg,
         .item-btn-drag:hover svg {
-            fill: #000;
+            fill: var(--text-primary);
         }
         
         /* Responsive - Mobile */
@@ -1006,18 +1012,10 @@
             max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: slideUp 0.3s ease;
+            animation: fadeIn 0.3s ease;
         }
         
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
-        
+
         .modal-header {
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
@@ -2960,6 +2958,7 @@
                     draggedElement = itemCard;
                     draggedIndex = parseInt(itemCard.dataset.index);
                     itemCard.classList.add('dragging');
+                    listaActualizada.classList.add('dragging-active');
                     e.dataTransfer.effectAllowed = 'move';
                     e.dataTransfer.setData('text/html', itemCard.innerHTML);
                 }
@@ -2969,6 +2968,7 @@
                 const itemCard = e.target.closest('.item-card');
                 if (itemCard) {
                     itemCard.classList.remove('dragging');
+                    listaActualizada.classList.remove('dragging-active');
                 }
             });
             
