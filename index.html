@@ -3595,7 +3595,7 @@
                 }
                 
                 const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
-                const detalles = item.querySelector('.resumen-item-details')?.textContent || '';
+                const detallesHTML = item.querySelector('.resumen-item-details')?.innerHTML || '';
                 const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
                 
                 // Mostrar nombre en negrita
@@ -3612,7 +3612,10 @@
                 doc.setTextColor(128, 128, 128);
                 
                 // Mostrar cantidad (primera línea de detalles)
-                const lineasDetalles = detalles.split('\n').filter(l => l.trim());
+                const lineasDetalles = detallesHTML
+                    .split(/<br\s*\/?>/gi)
+                    .map(linea => linea.trim())
+                    .filter(l => l.length > 0);
                 lineasDetalles.forEach((linea, idx) => {
                     doc.text(linea.substring(0, 40), margen + 5, yPosition);
                     yPosition += 3;
@@ -3744,7 +3747,7 @@
                 }
                 
                 const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
-                const detalles = item.querySelector('.resumen-item-details')?.textContent || '';
+                const detallesHTML = item.querySelector('.resumen-item-details')?.innerHTML || '';
                 const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
                 
                 // Mostrar nombre en negrita
@@ -3761,7 +3764,10 @@
                 doc.setTextColor(128, 128, 128);
                 
                 // Mostrar cantidad (primera línea de detalles)
-                const lineasDetalles = detalles.split('\n').filter(l => l.trim());
+                const lineasDetalles = detallesHTML
+                    .split(/<br\s*\/?>/gi)
+                    .map(linea => linea.trim())
+                    .filter(l => l.length > 0);
                 lineasDetalles.forEach((linea, idx) => {
                     doc.text(linea.substring(0, 40), margen + 5, yPosition);
                     yPosition += 3;
