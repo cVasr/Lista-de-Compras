@@ -314,26 +314,70 @@
             overflow: hidden !important;
         }
         
+        /* ============================================================
+           ARQUITECTURA DE NAVEGACIÓN - SECCIONES DE CONTENIDO
+           ============================================================
+           PATRÓN ÚNICO: Todas las secciones usan el mismo sistema
+           - display: none (oculto por defecto)
+           - display: flex SOLO cuando tiene clase .active
+           - NUNCA agregar display: flex directamente a #seccionXXX
+           ============================================================ */
+        
         .content-section {
-            display: none;
+            display: none;           /* OCULTO POR DEFECTO */
             flex-direction: column;
             flex: 1;
         }
         
         .content-section.active {
-            display: flex;
+            display: flex;           /* VISIBLE SOLO CUANDO ESTÁ ACTIVO */
             overflow: hidden;
         }
         
-        /* Sección Inicio - Contenedor principal que actúa como header + content */
+        /* ============================================================
+           ESTILOS ESPECÍFICOS (No rompen el patrón de visibilidad)
+           ============================================================ */
+        
+        /* Sección INICIO - Contenedor con header + content */
         #seccionInicio {
-            flex: 1;
-            flex-direction: column;
             padding: 0;
             overflow: hidden !important;
             overflow-y: hidden !important;
             overflow-x: hidden !important;
             gap: 0;
+        }
+        
+        /* Otras secciones - scroll y padding consistente */
+        #seccionListas,
+        #seccionGraficos,
+        #seccionConfiguracion {
+            padding: 16px;
+            scrollbar-gutter: stable;
+        }
+        
+        /* Permitir scroll cuando están activas */
+        #seccionListas.active,
+        #seccionGraficos.active,
+        #seccionConfiguracion.active {
+            overflow-y: scroll !important;
+            padding-bottom: calc(16px + var(--bottom-fixed-height));
+        }
+        
+        /* Ocultar scrollbars en todas las secciones */
+        #seccionInicio::-webkit-scrollbar,
+        #seccionListas::-webkit-scrollbar,
+        #seccionGraficos::-webkit-scrollbar,
+        #seccionConfiguracion::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        
+        #seccionInicio,
+        #seccionListas,
+        #seccionGraficos,
+        #seccionConfiguracion {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         
         /* Botones de acción - Header (NO scrollea NUNCA) */
@@ -368,38 +412,6 @@
         }
         
         .items-scroll-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        /* Otras secciones */
-        #seccionListas,
-        #seccionGraficos,
-        #seccionConfiguracion {
-            padding: 16px;
-            scrollbar-gutter: stable;
-            flex: 1;
-        }
-        
-        /* Override: Permitir scroll en estas secciones cuando están activas */
-        #seccionListas.active,
-        #seccionGraficos.active,
-        #seccionConfiguracion.active {
-            overflow-y: scroll !important;
-            padding-bottom: calc(16px + var(--bottom-fixed-height));
-        }
-        
-        /* Ocultar scrollbar en secciones */
-        #seccionListas::-webkit-scrollbar,
-        #seccionGraficos::-webkit-scrollbar,
-        #seccionConfiguracion::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-        }
-        
-        #seccionListas,
-        #seccionGraficos,
-        #seccionConfiguracion {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
@@ -2494,6 +2506,19 @@
         }
 
         function navigateTo(seccion) {
+            /* ============================================================
+               FUNCIÓN DE NAVEGACIÓN - Controla la visibilidad de secciones
+               ============================================================
+               PATRÓN: Remover .active de TODAS las secciones primero,
+                       luego agregar .active SOLO a la sección destino
+               
+               REGLA CRÍTICA: NUNCA agregar display: flex directamente a 
+                              los selectores #seccionXXX
+               
+               El display: flex se aplica automáticamente cuando la sección
+               tiene la clase .active (definido en CSS)
+               ============================================================ */
+            
             // Cerrar sidebar
             const sidebarElement = document.getElementById('sidebar');
             const overlayElement = document.getElementById('sidebarOverlay');
@@ -2540,6 +2565,45 @@
                 bottomFixedContainer.classList.remove('visible');
                 // Actualizar altura después de ocultar el footer
                 actualizarAltoBottomFixedContainer();
+            }
+            
+            // Validar que la navegación fue correcta
+            validarVisibilidadSecciones();
+        }
+        
+        /* ============================================================
+           VALIDACIÓN DE ARQUITECTURA - Detectar errores de visibilidad
+           ============================================================
+           Propósito: Verificar que solo una sección esté visible
+           Uso: Se ejecuta automáticamente en cada navegación
+           Ventaja: Detecta problemas en desarrollo antes de llegar a producción
+           ============================================================ */
+        function validarVisibilidadSecciones() {
+            const secciones = [
+                { id: 'seccionInicio', nombre: 'Inicio' },
+                { id: 'seccionListas', nombre: 'Listas Guardadas' },
+                { id: 'seccionGraficos', nombre: 'Mis Gastos' },
+                { id: 'seccionConfiguracion', nombre: 'Configuración' }
+            ];
+            
+            const activas = secciones.filter(s => 
+                document.getElementById(s.id)?.classList.contains('active')
+            );
+            
+            // Error: Más de una sección activa (DEBE EVITARSE)
+            if (activas.length > 1) {
+                console.error('❌ ERROR DE ARQUITECTURA: Múltiples secciones activas simultáneamente:',
+                    activas.map(s => s.nombre));
+            }
+            
+            // Error: Ninguna sección activa (DEBE EVITARSE)
+            if (activas.length === 0) {
+                console.error('❌ ERROR DE ARQUITECTURA: Ninguna sección visible');
+            }
+            
+            // Correcto: Solo una sección activa
+            if (activas.length === 1) {
+                console.log('✅ Navegación correcta → ' + activas[0].nombre);
             }
         }
 
