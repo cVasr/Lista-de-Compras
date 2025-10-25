@@ -1011,6 +1011,7 @@
             animation: fadeIn 0.3s ease;
         }
         
+
         .modal-header {
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
@@ -1477,11 +1478,11 @@
         }
         
         .resumen-item {
-            padding: 16px 0;
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            border-bottom: 2px solid #e0e0e0;
         }
         
         .resumen-item:last-child {
@@ -1496,13 +1497,12 @@
             font-weight: 700;
             font-size: 16px;
             color: #1a1a1a;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         
         .resumen-item-details {
             font-size: 13px;
             color: #666666;
-            line-height: 1.4;
         }
         
         .resumen-item-price {
@@ -1511,7 +1511,6 @@
             color: #1a1a1a;
             white-space: nowrap;
             margin-left: 12px;
-            text-align: right;
         }
         
         .resumen-summary {
@@ -2017,6 +2016,14 @@
                     </span>
                     <span class="tab-text">Presupuesto</span>
                 </button>
+                <button class="gastos-tab" onclick="cambiarTabGastos('iva')" data-tab="iva">
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="tab-text">IVA</span>
+                </button>
             </div>
 
             <!-- Contenido de cada tab -->
@@ -2148,6 +2155,91 @@
                         <canvas id="chartPresupuesto"></canvas>
                     </div>
                     <div id="presupuestoAnalisis"></div>
+                    
+                    <!-- Sección de IVA -->
+                    <div style="margin-top: 32px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                        <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px;">💰 Agregar IVA Total</h4>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ingresa el IVA total cobrado en la factura del supermercado</p>
+                        
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <input 
+                                type="text" 
+                                id="inputIVATotal" 
+                                class="form-input" 
+                                placeholder="Ej: 11.400"
+                                style="flex: 1; padding: 10px; font-size: 14px;"
+                            >
+                            <button 
+                                class="btn btn-primary" 
+                                onclick="agregarIVATotal()" 
+                                style="padding: 10px 20px; font-size: 14px; white-space: nowrap;"
+                            >
+                                Agregar
+                            </button>
+                        </div>
+                        
+                        <div id="ivaAgregadoInfo" style="display: none; background: rgba(57, 255, 20, 0.1); padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">IVA registrado en esta compra:</p>
+                            <p style="font-size: 16px; font-weight: 700; color: var(--primary-color);" id="ivaAgregadoValor">$0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab 6: IVA -->
+                <div class="gastos-panel" id="panel-iva">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Estadísticas de IVA</h3>
+                        <p class="panel-subtitle">IVA total pagado en tus compras</p>
+                    </div>
+                    
+                    <div class="presupuesto-cards">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 15.3L12.5 12.4V7Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">IVA Total Pagado</div>
+                                <div class="stat-card-value" id="totalIVAPagado">$0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V7H9V17ZM13 17H11V7H13V17ZM17 17H15V7H17V17Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">Número de Compras</div>
+                                <div class="stat-card-value" id="numeroComprasIVA">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 15.3L12.5 12.4V7Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-label">IVA Promedio</div>
+                                <div class="stat-card-value" id="promedioIVA">$0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px;">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Últimas compras registradas:</h4>
+                        <div id="listaIVACompras" style="max-height: 300px; overflow-y: auto;">
+                            <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px;">
+                                No hay registros de IVA aún
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="limpiarHistorialIVA()" style="width: 100%; margin-top: 16px; padding: 10px;">
+                        Limpiar historial de IVA
+                    </button>
                 </div>
             </div>
         </div>
@@ -2560,6 +2652,7 @@
             renderizarListasGuardadas();
             aplicarTraducciones();
             actualizarEstadoPresupuesto();
+            actualizarInfoIVAPresupuesto();
             
             // Mostrar footer en INICIO
             const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
@@ -2806,7 +2899,7 @@
             const nombre = document.getElementById('nombreProducto').value.trim();
             
             if (!nombre) {
-                
+                alert('El nombre del producto es obligatorio');
                 return;
             }
 
@@ -3228,7 +3321,7 @@
         // Guardar lista
         function guardarLista() {
             if (productos.length === 0) {
-                
+                alert('No hay artículos para guardar');
                 return;
             }
             document.getElementById('modalGuardar').classList.add('active');
@@ -3245,7 +3338,7 @@
             const nombreLista = document.getElementById('nombreLista').value.trim();
             
             if (!nombreLista) {
-                
+                alert('El nombre de la lista es obligatorio');
                 return;
             }
 
@@ -3261,7 +3354,7 @@
 
             localStorage.setItem('listasGuardadas', JSON.stringify(listas));
             cerrarModalGuardar();
-            
+            alert('Lista guardada exitosamente');
         }
         
         // Presupuesto
@@ -3435,6 +3528,7 @@
                         });
                         document.querySelector('.menu-item').classList.add('active');
                         
+                        alert('Lista cargada exitosamente');
                     }
                 }
             );
@@ -3480,8 +3574,8 @@
                     <div class="resumen-item-info">
                         <div class="resumen-item-name">${prod.nombre}</div>
                         <div class="resumen-item-details">
-                            ${prod.cantidad} ${prod.unidad}
-                            ${prod.marca ? '<br>' + prod.marca : ''}${prod.tienePromo ? '<br>' + (prod.tipoPromo === 'promocion' ? prod.descripcionPromo : prod.valorDescuento + '% OFF') : ''}
+                            ${prod.marca ? prod.marca + ' • ' : ''}${prod.cantidad} ${prod.unidad}
+                            ${prod.tienePromo ? ' • ' + (prod.tipoPromo === 'promocion' ? prod.descripcionPromo : prod.valorDescuento + '% OFF') : ''}
                         </div>
                     </div>
                     <div class="resumen-item-price">${formatearPrecio(prod.total)}</div>
@@ -3562,13 +3656,15 @@
             doc.setDrawColor(57, 255, 20);
             doc.line(margen, yPosition, pageWidth - margen, yPosition);
             
-            // Títulos de columnas - solo Producto y Precio
+            // Títulos de columnas
             yPosition += 10;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
             doc.setFont(undefined, 'bold');
             
+            const colAncho = anchoUtil / 3;
             doc.text('Producto', margen + 5, yPosition);
+            doc.text('Cantidad', pageWidth - margen - 30, yPosition, { align: 'right' });
             doc.text('Precio', pageWidth - margen - 5, yPosition, { align: 'right' });
             
             // Línea bajo encabezado
@@ -3593,41 +3689,22 @@
                 }
                 
                 const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
-                const detallesHTML = item.querySelector('.resumen-item-details')?.innerHTML || '';
+                const cantidad = item.querySelector('.resumen-item-details')?.textContent || '';
                 const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
                 
                 // Mostrar nombre en negrita
                 doc.setFont(undefined, 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
-                doc.text(nombre.substring(0, 35), margen + 5, yPosition);
-                doc.text(precio, pageWidth - margen - 5, yPosition, { align: 'right' });
+                doc.text(nombre.substring(0, 30), margen + 5, yPosition);
                 
-                // Mostrar cantidad debajo
-                yPosition += 5;
+                // Mostrar cantidad y precio en normal, alineados a la derecha
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(128, 128, 128);
+                doc.text(cantidad, pageWidth - margen - 30, yPosition + 3, { align: 'right' });
+                doc.text(precio, pageWidth - margen - 5, yPosition + 3, { align: 'right' });
                 
-                // Mostrar cantidad (primera línea de detalles)
-                const lineasDetalles = detallesHTML
-                    .split(/<br\s*\/?>/gi)
-                    .map(linea => linea.trim())
-                    .filter(l => l.length > 0);
-                lineasDetalles.forEach((linea, idx) => {
-                    doc.text(linea.substring(0, 40), margen + 5, yPosition);
-                    yPosition += 3;
-                });
-                
-                yPosition += 2;
-                
-                // Línea separadora solo si no es el último producto
-                if (index < items.length - 1) {
-                    doc.setDrawColor(220, 220, 220);
-                    doc.line(margen, yPosition, pageWidth - margen, yPosition);
-                    yPosition += 4;
-                }
-                
+                yPosition += 7;
+                doc.setFontSize(9);
                 doc.setTextColor(0, 0, 0);
             });
             
@@ -3716,13 +3793,15 @@
             doc.setDrawColor(57, 255, 20);
             doc.line(margen, yPosition, pageWidth - margen, yPosition);
             
-            // Títulos de columnas - solo Producto y Precio
+            // Títulos de columnas
             yPosition += 10;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
             doc.setFont(undefined, 'bold');
             
+            const colAncho = anchoUtil / 3;
             doc.text('Producto', margen + 5, yPosition);
+            doc.text('Cantidad', pageWidth - margen - 30, yPosition, { align: 'right' });
             doc.text('Precio', pageWidth - margen - 5, yPosition, { align: 'right' });
             
             // Línea bajo encabezado
@@ -3738,48 +3817,27 @@
             const itemsContainer = document.querySelector('#resumenItems');
             const items = itemsContainer.querySelectorAll('.resumen-item');
             
-            items.forEach((item, index) => {
+            items.forEach((item) => {
                 if (yPosition > pageHeight - 50) {
                     doc.addPage();
                     yPosition = 20;
                 }
                 
                 const nombre = item.querySelector('.resumen-item-name')?.textContent || 'Sin nombre';
-                const detallesHTML = item.querySelector('.resumen-item-details')?.innerHTML || '';
+                const cantidad = item.querySelector('.resumen-item-details')?.textContent || '';
                 const precio = item.querySelector('.resumen-item-price')?.textContent || '$0';
                 
-                // Mostrar nombre en negrita
                 doc.setFont(undefined, 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
-                doc.text(nombre.substring(0, 35), margen + 5, yPosition);
-                doc.text(precio, pageWidth - margen - 5, yPosition, { align: 'right' });
+                doc.text(nombre.substring(0, 30), margen + 5, yPosition);
                 
-                // Mostrar cantidad debajo
-                yPosition += 5;
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(128, 128, 128);
+                doc.text(cantidad, pageWidth - margen - 30, yPosition + 3, { align: 'right' });
+                doc.text(precio, pageWidth - margen - 5, yPosition + 3, { align: 'right' });
                 
-                // Mostrar cantidad (primera línea de detalles)
-                const lineasDetalles = detallesHTML
-                    .split(/<br\s*\/?>/gi)
-                    .map(linea => linea.trim())
-                    .filter(l => l.length > 0);
-                lineasDetalles.forEach((linea, idx) => {
-                    doc.text(linea.substring(0, 40), margen + 5, yPosition);
-                    yPosition += 3;
-                });
-                
-                yPosition += 2;
-                
-                // Línea separadora solo si no es el último producto
-                if (index < items.length - 1) {
-                    doc.setDrawColor(220, 220, 220);
-                    doc.line(margen, yPosition, pageWidth - margen, yPosition);
-                    yPosition += 4;
-                }
-                
+                yPosition += 7;
+                doc.setFontSize(9);
                 doc.setTextColor(0, 0, 0);
             });
             
@@ -3886,6 +3944,9 @@
                     break;
                 case 'presupuesto':
                     renderizarPresupuesto();
+                    break;
+                case 'iva':
+                    renderizarIVA();
                     break;
             }
         }
@@ -4239,6 +4300,133 @@
             document.getElementById('presupuestoAnalisis').innerHTML = analisisHTML;
         }
 
+
+        // Funciones para manejo de IVA
+        function agregarIVATotal() {
+            const inputIVA = document.getElementById('inputIVATotal');
+            const valorIVA = parseFloat(inputIVA.value.replace(/\./g, '').replace(/,/g, '.')) || 0;
+            
+            if (valorIVA <= 0) {
+                return;
+            }
+            
+            // Obtener historial de IVA
+            let historialIVA = JSON.parse(localStorage.getItem('historialIVA') || '[]');
+            
+            // Obtener última lista guardada
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const listaActual = Object.keys(listas).length > 0 ? 
+                Object.values(listas)[Object.keys(listas).length - 1] : null;
+            
+            const nombreLista = listaActual ? listaActual.nombre : 'Compra sin lista';
+            const totalProductos = productos.reduce((sum, p) => sum + p.total, 0);
+            
+            // Agregar nuevo registro
+            const nuevoRegistro = {
+                id: Date.now(),
+                fecha: new Date().toISOString(),
+                nombreLista: nombreLista,
+                ivaTotal: valorIVA,
+                totalProductos: totalProductos,
+                totalConIVA: totalProductos + valorIVA
+            };
+            
+            historialIVA.push(nuevoRegistro);
+            localStorage.setItem('historialIVA', JSON.stringify(historialIVA));
+            
+            inputIVA.value = '';
+            actualizarInfoIVAPresupuesto();
+            renderizarIVA();
+        }
+        
+        function actualizarInfoIVAPresupuesto() {
+            const historialIVA = JSON.parse(localStorage.getItem('historialIVA') || '[]');
+            const ultimoRegistro = historialIVA.length > 0 ? historialIVA[historialIVA.length - 1] : null;
+            
+            const infoDiv = document.getElementById('ivaAgregadoInfo');
+            const valorDiv = document.getElementById('ivaAgregadoValor');
+            
+            if (ultimoRegistro) {
+                infoDiv.style.display = 'block';
+                valorDiv.textContent = formatearPrecio(ultimoRegistro.ivaTotal);
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+        
+        function renderizarIVA() {
+            const historialIVA = JSON.parse(localStorage.getItem('historialIVA') || '[]');
+            
+            // Calcular estadísticas
+            const totalIVA = historialIVA.reduce((sum, reg) => sum + reg.ivaTotal, 0);
+            const numeroCompras = historialIVA.length;
+            const promedioIVA = numeroCompras > 0 ? totalIVA / numeroCompras : 0;
+            
+            // Actualizar tarjetas
+            document.getElementById('totalIVAPagado').textContent = formatearPrecio(totalIVA);
+            document.getElementById('numeroComprasIVA').textContent = numeroCompras.toString();
+            document.getElementById('promedioIVA').textContent = formatearPrecio(promedioIVA);
+            
+            // Renderizar lista de compras
+            const listaDiv = document.getElementById('listaIVACompras');
+            
+            if (historialIVA.length === 0) {
+                listaDiv.innerHTML = `
+                    <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px;">
+                        No hay registros de IVA aún
+                    </p>
+                `;
+                return;
+            }
+            
+            // Mostrar en orden inverso (más recientes primero)
+            const registrosOrdenados = [...historialIVA].reverse();
+            
+            listaDiv.innerHTML = registrosOrdenados.map(reg => {
+                const fecha = new Date(reg.fecha).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                return `
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                                ${reg.nombreLista}
+                            </p>
+                            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
+                                ${fecha}
+                            </p>
+                            <p style="font-size: 11px; color: var(--text-muted);">
+                                Subtotal: ${formatearPrecio(reg.totalProductos)}
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-size: 13px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">
+                                IVA: ${formatearPrecio(reg.ivaTotal)}
+                            </p>
+                            <p style="font-size: 11px; color: var(--text-muted);">
+                                Total: ${formatearPrecio(reg.totalConIVA)}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function limpiarHistorialIVA() {
+            mostrarConfirm(
+                '¿Limpiar historial de IVA?',
+                '¿Estás seguro de que deseas eliminar todo el historial de IVA? Esta acción no se puede deshacer.',
+                () => {
+                    localStorage.removeItem('historialIVA');
+                    renderizarIVA();
+                    actualizarInfoIVAPresupuesto();
+                }
+            );
+        }
+
         // Configuración
         function cambiarIdioma() {
             idioma = document.getElementById('selectIdioma').value;
@@ -4436,6 +4624,7 @@
                     const btnAplicar = document.getElementById('btnAplicarCambios');
                     if (btnAplicar) btnAplicar.style.display = 'none';
                     
+                    alert('Cambios aplicados exitosamente');
                 },
                 () => {
                     // Cancelar - restaurar valores
