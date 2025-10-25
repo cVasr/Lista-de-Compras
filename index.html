@@ -30,8 +30,6 @@
             --text-secondary: #e0e0e0;
             --text-muted: #808080;
             --bottom-fixed-height: 0px;
-            --footer-height: 0px;
-            --main-content-height: calc(100vh - 60px);
         }
         
         [data-theme="light"] {
@@ -307,12 +305,12 @@
             visibility: visible;
         }
         
-        /* Main Content */
+        /* Main Content - Contenedor padre */
         .main-content {
+            position: relative;
             margin-top: 60px;
-            display: flex;
-            flex-direction: column;
-            height: var(--main-content-height);
+            width: 100%;
+            height: calc(100vh - 60px);
             overflow: hidden !important;
         }
         
@@ -326,42 +324,53 @@
            ============================================================ */
         
         .content-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: none;           /* OCULTO POR DEFECTO */
             flex-direction: column;
-            flex: 1;
+            z-index: 10;
         }
         
         .content-section.active {
             display: flex;           /* VISIBLE SOLO CUANDO ESTÁ ACTIVO */
             overflow: hidden;
+            z-index: 100;
         }
         
         /* ============================================================
            ESTILOS ESPECÍFICOS (No rompen el patrón de visibilidad)
            ============================================================ */
         
-        /* Sección INICIO - Contenedor con header + content */
+        /* Sección INICIO - Gestiona su propio espacio de forma independiente */
         #seccionInicio {
             padding: 0;
-            overflow: hidden !important;
-            overflow-y: hidden !important;
-            overflow-x: hidden !important;
             gap: 0;
+            display: none;
         }
         
-        /* Otras secciones - scroll y padding consistente */
+        #seccionInicio.active {
+            display: flex;
+        }
+        
+        /* Otras secciones - Cada una independiente con scroll */
         #seccionListas,
         #seccionGraficos,
         #seccionConfiguracion {
             padding: 16px;
             scrollbar-gutter: stable;
+            display: none;
+            overflow-y: scroll !important;
+            overflow-x: hidden !important;
         }
         
-        /* Permitir scroll cuando están activas */
+        /* Cuando están activas */
         #seccionListas.active,
         #seccionGraficos.active,
         #seccionConfiguracion.active {
-            overflow-y: scroll !important;
+            display: flex;
             padding-bottom: 100px;
         }
         
@@ -2552,19 +2561,11 @@
 
         function actualizarAltoBottomFixedContainer() {
             const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
-            const mainContent = document.querySelector('.main-content');
-            
             if (bottomFixedContainer && bottomFixedContainer.classList.contains('visible')) {
                 const altura = bottomFixedContainer.offsetHeight;
                 document.documentElement.style.setProperty('--bottom-fixed-height', altura + 'px');
-                document.documentElement.style.setProperty('--footer-height', altura + 'px');
-                // Ajustar la altura de main-content para que no se superponga con el footer
-                document.documentElement.style.setProperty('--main-content-height', `calc(100vh - 60px - ${altura}px)`);
             } else {
                 document.documentElement.style.setProperty('--bottom-fixed-height', '0px');
-                document.documentElement.style.setProperty('--footer-height', '0px');
-                // Restaurar la altura normal de main-content
-                document.documentElement.style.setProperty('--main-content-height', 'calc(100vh - 60px)');
             }
         }
 
