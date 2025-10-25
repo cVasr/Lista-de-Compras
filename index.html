@@ -490,7 +490,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
-            transition: background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, opacity 0.2s ease;
             position: relative;
             cursor: grab;
             display: flex;
@@ -503,14 +503,9 @@
         }
         
         .item-card.dragging {
-            opacity: 1;
+            opacity: 1 !important;
             cursor: grabbing;
             z-index: 10;
-        }
-        
-        /* Cuando hay dragging activo, los demás items bajan la transparencia */
-        .items-scroll-container.dragging-active .item-card:not(.dragging) {
-            opacity: 0.3;
         }
         
         /* Item comprado */
@@ -2958,7 +2953,15 @@
                     draggedElement = itemCard;
                     draggedIndex = parseInt(itemCard.dataset.index);
                     itemCard.classList.add('dragging');
-                    listaActualizada.classList.add('dragging-active');
+                    
+                    // Aplicar opacidad baja a todos los demás items
+                    const allItems = listaActualizada.querySelectorAll('.item-card');
+                    allItems.forEach(item => {
+                        if (item !== itemCard) {
+                            item.style.opacity = '0.3';
+                        }
+                    });
+                    
                     e.dataTransfer.effectAllowed = 'move';
                     e.dataTransfer.setData('text/html', itemCard.innerHTML);
                 }
@@ -2968,7 +2971,12 @@
                 const itemCard = e.target.closest('.item-card');
                 if (itemCard) {
                     itemCard.classList.remove('dragging');
-                    listaActualizada.classList.remove('dragging-active');
+                    
+                    // Restaurar opacidad a todos los items
+                    const allItems = listaActualizada.querySelectorAll('.item-card');
+                    allItems.forEach(item => {
+                        item.style.opacity = '';
+                    });
                 }
             });
             
