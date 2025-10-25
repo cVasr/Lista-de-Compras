@@ -7,12 +7,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Ionicons Library -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+        }
+        
+        ion-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         
         html {
@@ -96,6 +105,13 @@
             fill: var(--primary-text);
         }
         
+        .menu-btn ion-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-text);
+            font-size: 24px;
+        }
+        
         .menu-btn:active {
             background: rgba(57, 255, 20, 0.1);
         }
@@ -153,16 +169,22 @@
             width: 16px;
             height: 16px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
         
         .theme-icon-sun {
             fill: var(--primary-color);
             opacity: 0.3;
+            color: var(--primary-color);
         }
         
         .theme-icon-moon {
             fill: var(--text-secondary);
             opacity: 1;
+            color: var(--text-secondary);
         }
         
         /* Light theme state */
@@ -285,6 +307,11 @@
         .menu-item-text {
             font-size: 15px;
             font-weight: 600;
+            color: var(--primary-text);
+        }
+        
+        [data-theme="light"] .menu-item-text {
+            color: #1a1a1a;
         }
         
         /* Overlay */
@@ -304,6 +331,11 @@
         .sidebar-overlay.active {
             opacity: 1;
             visibility: visible;
+        }
+        
+        /* Bloquear sidebar cuando hay modal confirmación */
+        .sidebar-overlay.blocked {
+            pointer-events: none !important;
         }
         
         /* Main Content - Contenedor padre */
@@ -671,6 +703,13 @@
             fill: var(--text-primary);
         }
         
+        .item-btn-icon ion-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--text-primary);
+            font-size: 18px;
+        }
+        
         .item-btn-icon svg {
             width: 18px;
             height: 18px;
@@ -784,6 +823,13 @@
             transition: stroke 0.3s;
         }
         
+        .budget-edit-btn ion-icon {
+            width: 16px;
+            height: 16px;
+            color: var(--text-primary);
+            transition: color 0.3s;
+        }
+        
         .budget-edit-btn:active {
             background: rgba(57, 255, 20, 0.1);
             border-color: var(--primary-color);
@@ -791,6 +837,10 @@
         
         .budget-edit-btn:active svg {
             stroke: var(--primary-color);
+        }
+        
+        .budget-edit-btn:active ion-icon {
+            color: var(--primary-color);
         }
         
         /* Contenedor de botones de presupuesto */
@@ -822,6 +872,13 @@
             transition: stroke 0.3s;
         }
         
+        .budget-delete-btn ion-icon {
+            width: 16px;
+            height: 16px;
+            color: var(--text-primary);
+            transition: color 0.3s;
+        }
+        
         .budget-delete-btn:active {
             background: rgba(255, 50, 50, 0.1);
             border-color: #ff3232;
@@ -831,11 +888,19 @@
             stroke: #ff3232;
         }
         
+        .budget-delete-btn:active ion-icon {
+            color: #ff3232;
+        }
+        
         .budget-amount {
             font-size: 20px;
             font-weight: 700;
             color: var(--primary-text);
             margin: 2px 0 0 0;
+        }
+        
+        [data-theme="light"] .budget-amount {
+            color: #39ff14;
         }
         
         .budget-remaining {
@@ -860,6 +925,22 @@
             border-radius: 10px;
             overflow: hidden;
             margin: 2px 0 0 0;
+        }
+        
+        [data-theme="light"] .budget-progress-bar {
+            background: #39ff14 !important;
+        }
+        
+        [data-theme="light"] .budget-progress-fill.low {
+            background: #1a1a1a !important;
+        }
+        
+        [data-theme="light"] .budget-progress-fill.medium {
+            background: #ff9500 !important;
+        }
+        
+        [data-theme="light"] .budget-progress-fill.high {
+            background: #ff3232 !important;
         }
         
         .budget-progress-fill {
@@ -936,13 +1017,18 @@
         
         .btn {
             flex: 1;
-            padding: 8px;
+            padding: 10px 12px;
             border: none;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 40px;
         }
         
         .btn-primary {
@@ -960,13 +1046,6 @@
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
             transition: all 0.2s ease, background 0.3s ease, border-color 0.3s ease;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px;
-            font-size: 12px;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -999,6 +1078,16 @@
         
         .modal.active {
             display: flex;
+            pointer-events: auto;
+        }
+        
+        /* Bloquear interacciones fuera del modal */
+        .modal.active ~ * {
+            pointer-events: none !important;
+        }
+        
+        body.no-scroll .modal:not(.active) {
+            pointer-events: none;
         }
         
         .modal-content {
@@ -1300,6 +1389,17 @@
             color: var(--text-muted);
         }
         
+        .iva-indicator {
+            font-size: 11px;
+            color: #39ff14;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        [data-theme="light"] .iva-indicator {
+            color: #c41e3a;
+        }
+        
         .saved-list-info {
             display: flex;
             gap: 12px;
@@ -1351,6 +1451,23 @@
             opacity: 0.8;
         }
         
+        /* Confirm Dialog Overlay */
+        .confirm-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 3000;
+            display: none;
+            pointer-events: auto;
+        }
+        
+        .confirm-dialog-overlay.active {
+            display: block;
+        }
+        
         /* Confirm Dialog */
         .confirm-dialog {
             position: fixed;
@@ -1359,12 +1476,13 @@
             transform: translate(-50%, -50%);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 24px;
             padding: 24px;
             width: calc(100% - 32px);
             max-width: 400px;
-            z-index: 3000;
+            z-index: 3001;
             display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
         
         .confirm-dialog.active {
@@ -1382,11 +1500,48 @@
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 20px;
+            white-space: pre-line;
+            line-height: 1.4;
         }
         
         .confirm-actions {
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .confirm-actions .btn {
+            padding: 8px 12px;
+            min-height: auto;
+            font-size: 12px;
+        }
+        
+        .confirm-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            border-radius: 6px;
+        }
+        
+        .confirm-close-btn:active {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .confirm-close-btn ion-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
         }
         
         /* Modal Resumen */
@@ -1564,7 +1719,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             min-height: 300px;
         }
         
@@ -1623,20 +1778,31 @@
         }
         
         .tab-icon {
-            width: 16px;
-            height: 16px;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
         .tab-icon svg {
-            width: 14px;
-            height: 14px;
+            width: 20px;
+            height: 20px;
+            color: var(--text-primary);
+        }
+        
+        .tab-icon ion-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
             color: var(--text-primary);
         }
         
         .gastos-tab.active .tab-icon svg {
+            color: #000000;
+        }
+        
+        .gastos-tab.active .tab-icon ion-icon {
             color: #000000;
         }
         
@@ -1692,7 +1858,7 @@
         .descuentos-cards,
         .presupuesto-cards {
             display: grid;
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 20px;
         }
         
@@ -1700,15 +1866,15 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
         
         .stat-card-icon {
-            width: 48px;
-            height: 48px;
+            width: 34px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1718,9 +1884,16 @@
         }
         
         .stat-card-icon svg {
-            width: 28px;
-            height: 28px;
+            width: 20px;
+            height: 20px;
             fill: var(--text-primary);
+        }
+        
+        .stat-card-icon ion-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            color: var(--text-primary);
         }
         
         .stat-card-content {
@@ -1739,38 +1912,42 @@
             color: var(--primary-text);
         }
         
+        [data-theme="light"] #diferencia {
+            color: #000000 !important;
+        }
+        
         /* Panel Stats */
         .panel-stats {
-            margin-top: 16px;
+            margin-top: 24px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
         
         .stat-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
+            padding: 16px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 8px;
         }
         
         .stat-row-label {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-secondary);
         }
         
         .stat-row-value {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--primary-text);
         }
         
         /* Análisis de presupuesto */
         #presupuestoAnalisis {
-            margin-top: 16px;
+            margin-top: 20px;
             padding: 16px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -1834,28 +2011,14 @@
     <!-- Header -->
     <div class="app-header">
         <button class="menu-btn" onclick="toggleSidebar()">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            <ion-icon name="menu"></ion-icon>
         </button>
         <div class="app-title">Lista de Compras</div>
         <div class="theme-toggle-container" onclick="toggleTheme()">
             <div class="theme-toggle-track">
                 <div class="theme-toggle-icons">
-                    <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
-                        <line x1="12" y1="2" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="12" y1="20" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="2" y1="12" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="20" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
-                    </svg>
+                    <ion-icon class="theme-icon theme-icon-sun" name="sunny"></ion-icon>
+                    <ion-icon class="theme-icon theme-icon-moon" name="moon"></ion-icon>
                 </div>
                 <div class="theme-toggle-thumb"></div>
             </div>
@@ -1867,48 +2030,31 @@
         <div class="sidebar-header">
             <div class="sidebar-title">Menú</div>
             <button class="close-sidebar" onclick="toggleSidebar()">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
+                <ion-icon name="close"></ion-icon>
             </button>
         </div>
         <div class="sidebar-menu">
             <div class="menu-item active" onclick="navigateTo('inicio')">
                 <span class="menu-item-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" fill="currentColor"/>
-                        <path d="M9 22V12H15V22" fill="var(--bg-card)"/>
-                    </svg>
+                    <ion-icon name="home"></ion-icon>
                 </span>
                 <span class="menu-item-text">Inicio</span>
             </div>
             <div class="menu-item" onclick="navigateTo('listas')">
                 <span class="menu-item-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
-                        <line x1="7" y1="8" x2="17" y2="8" stroke="var(--bg-card)" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="7" y1="12" x2="17" y2="12" stroke="var(--bg-card)" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="7" y1="16" x2="13" y2="16" stroke="var(--bg-card)" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+                    <ion-icon name="document-text"></ion-icon>
                 </span>
                 <span class="menu-item-text">Listas guardadas</span>
             </div>
             <div class="menu-item" onclick="navigateTo('graficos')">
                 <span class="menu-item-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="3" y="12" width="4" height="9" fill="currentColor"/>
-                        <rect x="10" y="7" width="4" height="14" fill="currentColor"/>
-                        <rect x="17" y="3" width="4" height="18" fill="currentColor"/>
-                    </svg>
+                    <ion-icon name="bar-chart"></ion-icon>
                 </span>
                 <span class="menu-item-text">Mis Gastos</span>
             </div>
             <div class="menu-item" onclick="navigateTo('configuracion')">
                 <span class="menu-item-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                        <path d="M12 1V3M12 21V23M23 12H21M3 12H1M20.485 3.515L19.071 4.929M4.929 19.071L3.515 20.485M20.485 20.485L19.071 19.071M4.929 4.929L3.515 3.515" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <ion-icon name="settings"></ion-icon>
                 </span>
                 <span class="menu-item-text">Configuración</span>
             </div>
@@ -1928,22 +2074,23 @@
             <!-- 1. Botones de acción (Header) -->
             <div class="action-buttons-top">
                 <button class="btn btn-secondary" onclick="guardarLista()">
-                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M17 21V13H7V21M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <ion-icon name="save" style="margin-right: 4px;"></ion-icon>
                     Guardar lista
                 </button>
                 <button class="btn btn-secondary" onclick="confirmarLimpiar()">
-                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <ion-icon name="trash" style="margin-right: 4px;"></ion-icon>
                     Limpiar todo
                 </button>
             </div>
 
-            <!-- 2. Lista de artículos con scroll -->
+            <!-- 2. Indicador de lista cargada -->
+            <div id="indicadorListaCargada" style="display: none; padding: 10px; background: rgba(57, 255, 20, 0.1); border-left: 4px solid var(--primary-color); margin: 0px 16px 16px 16px; border-radius: 4px;">
+                <div style="font-size: 14px; color: var(--text-primary);">
+                    Lista cargada: <span style="font-weight: 500;" id="nombreListaCargadaDisplay"></span>
+                </div>
+            </div>
+
+            <!-- 3. Lista de artículos con scroll -->
             <div class="items-scroll-container">
                 <div id="listaCompras" class="items-list"></div>
 
@@ -1974,53 +2121,37 @@
             <div class="gastos-tabs">
                 <button class="gastos-tab active" onclick="cambiarTabGastos('top-articulos')" data-tab="top-articulos">
                     <span class="tab-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
-                        </svg>
+                        <ion-icon name="star"></ion-icon>
                     </span>
                     <span class="tab-text">Top Artículos</span>
                 </button>
                 <button class="gastos-tab" onclick="cambiarTabGastos('por-categoria')" data-tab="por-categoria">
                     <span class="tab-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="3" y="12" width="4" height="9" fill="currentColor"/>
-                            <rect x="10" y="7" width="4" height="14" fill="currentColor"/>
-                            <rect x="17" y="3" width="4" height="18" fill="currentColor"/>
-                        </svg>
+                        <ion-icon name="stats-chart"></ion-icon>
                     </span>
                     <span class="tab-text">Por Categoría</span>
                 </button>
                 <button class="gastos-tab" onclick="cambiarTabGastos('descuentos')" data-tab="descuentos">
                     <span class="tab-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
-                        </svg>
+                        <ion-icon name="pricetag"></ion-icon>
                     </span>
                     <span class="tab-text">Descuentos</span>
                 </button>
                 <button class="gastos-tab" onclick="cambiarTabGastos('comparacion')" data-tab="comparacion">
                     <span class="tab-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M3 3V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M7 14L12 9L15 12L21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <ion-icon name="podium"></ion-icon>
                     </span>
                     <span class="tab-text">Comparación</span>
                 </button>
                 <button class="gastos-tab" onclick="cambiarTabGastos('presupuesto')" data-tab="presupuesto">
                     <span class="tab-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
+                        <ion-icon name="wallet"></ion-icon>
                     </span>
                     <span class="tab-text">Presupuesto</span>
                 </button>
                 <button class="gastos-tab" onclick="cambiarTabGastos('iva')" data-tab="iva">
                     <span class="tab-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
-                        </svg>
+                        <ion-icon name="server"></ion-icon>
                     </span>
                     <span class="tab-text">IVA</span>
                 </button>
@@ -2033,6 +2164,9 @@
                     <div class="panel-header">
                         <h3 class="panel-title">Top 5 Artículos con Mayor Gasto</h3>
                         <p class="panel-subtitle">Los productos en los que más has gastado</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            💡 Los datos mostrados corresponden a la última lista que guardaste
+                        </p>
                     </div>
                     <div class="chart-container">
                         <canvas id="chartTopArticulos"></canvas>
@@ -2045,6 +2179,9 @@
                     <div class="panel-header">
                         <h3 class="panel-title">Gastos por Categoría</h3>
                         <p class="panel-subtitle">Distribución de tu dinero por categorías</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            💡 Los datos mostrados corresponden a la última lista que guardaste
+                        </p>
                     </div>
                     <div class="chart-container">
                         <canvas id="chartCategorias"></canvas>
@@ -2057,13 +2194,14 @@
                     <div class="panel-header">
                         <h3 class="panel-title">Impacto de Descuentos</h3>
                         <p class="panel-subtitle">Cuánto has ahorrado con promociones</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            💡 Los datos mostrados corresponden a la última lista que guardaste
+                        </p>
                     </div>
                     <div class="descuentos-cards">
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13.41 18.09L12 17.23L10.59 18.09L10.95 16.47L9.73 15.29L11.37 15.07L12 13.56L12.63 15.07L14.27 15.29L13.05 16.47L13.41 18.09ZM12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="pricetag"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">Total Ahorrado</div>
@@ -2072,9 +2210,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 6H16V4C16 2.89 15.11 2 14 2H10C8.89 2 8 2.89 8 4V6H4C2.89 6 2.01 6.89 2.01 8L2 19C2 20.11 2.89 21 4 21H20C21.11 21 22 20.11 22 19V8C22 6.89 21.11 6 20 6ZM10 4H14V6H10V4ZM12 17L7 12H10V9H14V12H17L12 17Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="basket"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">Productos con Descuento</div>
@@ -2083,9 +2219,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M16 11V3H8V9H2V21H22V11H16ZM10 5H14V19H10V5ZM4 11H8V19H4V11ZM20 19H16V13H20V19Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="stats-chart"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">% de Ahorro Promedio</div>
@@ -2103,6 +2237,9 @@
                     <div class="panel-header">
                         <h3 class="panel-title">Comparación con Listas Anteriores</h3>
                         <p class="panel-subtitle">Evolución de tus gastos en el tiempo</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            💡 Se comparan las dos últimas compras que guardaste
+                        </p>
                     </div>
                     <div class="chart-container">
                         <canvas id="chartComparacion"></canvas>
@@ -2115,13 +2252,14 @@
                     <div class="panel-header">
                         <h3 class="panel-title">Presupuesto vs Gasto Real</h3>
                         <p class="panel-subtitle">Análisis de tu lista más reciente</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            💡 Los datos mostrados corresponden al último presupuesto que ingresaste en tu lista guardada
+                        </p>
                     </div>
                     <div class="presupuesto-cards">
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 15.3L12.5 12.4V7Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="wallet"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">Presupuesto</div>
@@ -2130,9 +2268,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 8H4C2.9 8 2.01 8.9 2.01 10L2 20C2 21.1 2.9 22 4 22H20C21.1 22 22 21.1 22 20V10C22 8.9 21.1 8 20 8ZM20 20H4V14H20V20ZM20 10H4V10H20Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="card"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">Gasto Real</div>
@@ -2141,46 +2277,12 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM17 13H13V17H11V13H7V11H11V7H13V11H17V13Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="add-circle"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">Diferencia</div>
                                 <div class="stat-card-value" id="diferencia">$0</div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="chartPresupuesto"></canvas>
-                    </div>
-                    <div id="presupuestoAnalisis"></div>
-                    
-                    <!-- Sección de IVA -->
-                    <div style="margin-top: 32px; padding-top: 20px; border-top: 2px solid var(--border-color);">
-                        <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px;">💰 Agregar IVA Total</h4>
-                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ingresa el IVA total cobrado en la factura del supermercado</p>
-                        
-                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                            <input 
-                                type="text" 
-                                id="inputIVATotal" 
-                                class="form-input" 
-                                placeholder="Ej: 11.400"
-                                style="flex: 1; padding: 10px; font-size: 14px;"
-                            >
-                            <button 
-                                class="btn btn-primary" 
-                                onclick="agregarIVATotal()" 
-                                style="padding: 10px 20px; font-size: 14px; white-space: nowrap;"
-                            >
-                                Agregar
-                            </button>
-                        </div>
-                        
-                        <div id="ivaAgregadoInfo" style="display: none; background: rgba(57, 255, 20, 0.1); padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
-                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">IVA registrado en esta compra:</p>
-                            <p style="font-size: 16px; font-weight: 700; color: var(--primary-color);" id="ivaAgregadoValor">$0</p>
                         </div>
                     </div>
                 </div>
@@ -2190,14 +2292,15 @@
                     <div class="panel-header">
                         <h3 class="panel-title">Estadísticas de IVA</h3>
                         <p class="panel-subtitle">IVA total pagado en tus compras</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            💡 Los datos son la suma acumulada de todos los IVA que has registrado en tus compras guardadas
+                        </p>
                     </div>
                     
                     <div class="presupuesto-cards">
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 15.3L12.5 12.4V7Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="wallet"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">IVA Total Pagado</div>
@@ -2206,9 +2309,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V7H9V17ZM13 17H11V7H13V17ZM17 17H15V7H17V17Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="list"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">Número de Compras</div>
@@ -2217,9 +2318,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 15.3L12.5 12.4V7Z" fill="currentColor"/>
-                                </svg>
+                                <ion-icon name="wallet"></ion-icon>
                             </div>
                             <div class="stat-card-content">
                                 <div class="stat-card-label">IVA Promedio</div>
@@ -2230,16 +2329,15 @@
                     
                     <div style="margin-top: 24px;">
                         <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Últimas compras registradas:</h4>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; padding: 10px; background: rgba(57, 255, 20, 0.05); border-radius: 8px; border-left: 3px solid var(--primary-color);">
+                            📌 Se muestran solo los <strong>últimos 5 registros</strong>. Los registros se conservan automáticamente para tus estadísticas, pero la visualización se limita a los más recientes.
+                        </p>
                         <div id="listaIVACompras" style="max-height: 300px; overflow-y: auto;">
                             <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px;">
                                 No hay registros de IVA aún
                             </p>
                         </div>
                     </div>
-                    
-                    <button class="btn btn-secondary" onclick="limpiarHistorialIVA()" style="width: 100%; margin-top: 16px; padding: 10px;">
-                        Limpiar historial de IVA
-                    </button>
                 </div>
             </div>
         </div>
@@ -2330,16 +2428,16 @@
                     <span class="budget-label">Presupuesto disponible</span>
                     <div class="budget-buttons-group">
                         <button class="budget-edit-btn" onclick="abrirModalPresupuesto()" title="Editar presupuesto">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <ion-icon name="create"></ion-icon>
                         </button>
                         <button class="budget-delete-btn" onclick="confirmarBorrarPresupuesto()" title="Borrar presupuesto">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 6H5H21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                        <button class="budget-edit-btn" onclick="abrirModalAgregarIVA()" title="Agregar IVA">
+                            <ion-icon name="server"></ion-icon>
+                        </button>
+                        <button class="budget-edit-btn" onclick="abrirModalGuardarPresupuesto()" title="Guardar presupuesto">
+                            <ion-icon name="cash"></ion-icon>
                         </button>
                     </div>
                 </div>
@@ -2374,9 +2472,7 @@
             <div class="modal-header">
                 <div class="modal-title" id="modalArticuloTitulo">Agregar artículo</div>
                 <button class="modal-close" onclick="cerrarModalArticulo()">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+                    <ion-icon name="close"></ion-icon>
                 </button>
             </div>
             <div class="modal-body">
@@ -2478,21 +2574,24 @@
                     </svg>
                     Guardar Lista
                 </div>
-                <button class="modal-close" onclick="cerrarModalGuardar()">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+                <button class="modal-close" style="display: flex; align-items: center; justify-content: center;" onclick="cerrarModalGuardar()">
+                    <ion-icon name="close"></ion-icon>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Nombre de la lista</label>
-                    <input type="text" class="form-input" id="nombreLista" placeholder="Ej: Compras del mes">
+                    <input type="text" class="form-input" id="nombreLista" placeholder="Ej: Compras del mes" oninput="verificarNombreLista()">
+                </div>
+                <!-- Mensaje de error si el nombre existe -->
+                <div id="mensajeErrorNombre" style="display: none; color: #ff4444; font-size: 13px; margin-top: 8px; padding: 8px; background: rgba(255, 68, 68, 0.1); border-radius: 6px; border-left: 3px solid #ff4444;">
+                    ⚠️ Este nombre ya se encuentra registrado
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="cerrarModalGuardar()">Cancelar</button>
-                <button class="btn btn-primary" onclick="confirmarGuardarLista()">Guardar</button>
+                <button class="btn btn-primary" id="btnGuardarLista" onclick="confirmarGuardarLista()">Guardar</button>
+                <button class="btn btn-delete" id="btnSobrescribir" style="display: none;" onclick="sobrescribirLista()">Sobrescribir</button>
             </div>
         </div>
     </div>
@@ -2508,10 +2607,8 @@
                     </svg>
                     Agregar Presupuesto
                 </div>
-                <button class="modal-close" onclick="cerrarModalPresupuesto()">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+                <button class="modal-close" style="display: flex; align-items: center; justify-content: center;" onclick="cerrarModalPresupuesto()">
+                    <ion-icon name="close"></ion-icon>
                 </button>
             </div>
             <div class="modal-body">
@@ -2527,13 +2624,155 @@
         </div>
     </div>
 
+    <!-- Modal Guardar Presupuesto -->
+    <div class="modal" id="modalGuardarPresupuesto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12V19C19 19.5304 18.7893 20.0391 18.4142 20.4142C18.0391 20.7893 17.5304 21 17 21H7C6.46957 21 5.96086 20.7893 5.58579 20.4142C5.21071 20.0391 5 19.5304 5 19V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H12M19 3V9M19 3L12 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Guardar Presupuesto
+                </div>
+                <button class="modal-close" style="display: flex; align-items: center; justify-content: center;" onclick="cerrarModalGuardarPresupuesto()">
+                    <ion-icon name="close"></ion-icon>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                    ¿Deseas guardar este presupuesto? Se registrará en la pestaña "Presupuesto" de "Mis Gastos".
+                </p>
+                <div id="guardarPresupuestoInfo" style="background: rgba(57, 255, 20, 0.1); padding: 14px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+                        <div>
+                            <p style="color: var(--text-muted); margin-bottom: 4px;">Presupuesto:</p>
+                            <p style="font-weight: 700; font-size: 16px; color: var(--primary-color);" id="presuGuardarMonto">$0</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--text-muted); margin-bottom: 4px;">Gasto Real:</p>
+                            <p style="font-weight: 700; font-size: 16px; color: var(--primary-color);" id="gastoGuardarMonto">$0</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--text-muted); margin-bottom: 4px;">Disponible:</p>
+                            <p style="font-weight: 700; font-size: 16px;" id="disponibleGuardarMonto">$0</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--text-muted); margin-bottom: 4px;">Productos:</p>
+                            <p style="font-weight: 700; font-size: 16px; color: var(--primary-color);" id="productosGuardarCantidad">0</p>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px; font-style: italic;">
+                    💡 Nota: El IVA se guarda solo si guardas la lista completa.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalGuardarPresupuesto()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarGuardarPresupuesto()">Guardar Presupuesto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar IVA -->
+    <div class="modal" id="modalAgregarIVA">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalAgregarIVATitle">
+                    <svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 15.3L12.5 12.4V7Z" fill="currentColor"/>
+                    </svg>
+                    Calcular total con IVA
+                </div>
+                <button class="modal-close" style="display: flex; align-items: center; justify-content: center;" onclick="cerrarModalAgregarIVA()">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Ingresa el IVA total cobrado en la factura del supermercado. Este campo es <strong>opcional</strong>.
+                </p>
+                <label class="form-label">IVA Total (Opcional)</label>
+                <input type="text" class="form-input" id="inputIVAModalTotal" placeholder="Ej: 11.400" oninput="actualizarEstadoBotonesIVA()">
+                
+                <!-- Mostrar el total con IVA -->
+                <div id="totalConIVADisplay" style="display: none; background: rgba(57, 255, 20, 0.1); padding: 14px; border-radius: 8px; margin-top: 16px; border-left: 4px solid var(--primary-color);">
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Total de la compra con IVA:</p>
+                    <p style="font-size: 20px; font-weight: 700; color: var(--primary-color);" id="totalConIVAValor">$0</p>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn btn-primary" id="btnGuardarListaConIVA" onclick="abrirConfirmacionPagoIVA()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H11L13 5H19C20.1 5 21 5.9 21 7H21V19C21 20.1 20.1 21 19 21ZM19 9H5V19H19V9Z" fill="currentColor"/>
+                    </svg>
+                    Guardar lista con IVA
+                </button>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="cerrarModalAgregarIVA()" style="flex: 1;">Cancelar</button>
+                    <button class="btn btn-secondary" onclick="confirmarAgregarIVA()" style="flex: 1;">Solo visualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación de Pago de IVA -->
+    <div class="modal" id="modalConfirmacionPagoIVA">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" fill="currentColor"/>
+                    </svg>
+                    ¿Ya pagaste este IVA?
+                </div>
+                <button class="modal-close" style="display: flex; align-items: center; justify-content: center;" onclick="cerrarConfirmacionPagoIVA()">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+                    Confirma si ya pagaste este IVA en tu factura para registrarlo en tu historial de compras.
+                </p>
+                
+                <!-- Resumen del pago -->
+                <div style="background: var(--bg-card); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 12px; color: var(--text-muted);">Subtotal:</span>
+                        <span style="font-size: 12px; color: var(--text-secondary);" id="ivaConfirmSubtotal">$0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 12px; color: var(--text-muted);">IVA:</span>
+                        <span style="font-size: 12px; color: var(--text-secondary);" id="ivaConfirmIVA">$0</span>
+                    </div>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 8px; display: flex; justify-content: space-between;">
+                        <span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Total pagado:</span>
+                        <span style="font-size: 13px; font-weight: 700; color: var(--primary-color);" id="ivaConfirmTotal">$0</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+                        Hoy, <span id="ivaConfirmFecha"></span>
+                    </div>
+                </div>
+                
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center;">
+                    Esto se registrará en el tab <strong>"IVA"</strong> en "Mis Gastos"
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" onclick="cerrarConfirmacionPagoIVA()" style="flex: 1;">No lo pagué aún</button>
+                <button class="btn btn-primary" onclick="confirmarPagoIVA()" style="flex: 1;">Sí, ya lo pagué</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay para Dialog de Confirmación -->
+    <div class="confirm-dialog-overlay" id="confirmDialogOverlay"></div>
+
     <!-- Confirm Dialog -->
     <div class="confirm-dialog" id="confirmDialog">
+        <button class="confirm-close-btn" onclick="cerrarConfirm()" title="Cerrar">
+            <ion-icon name="close"></ion-icon>
+        </button>
         <div class="confirm-title" id="confirmTitle"></div>
         <div class="confirm-text" id="confirmText"></div>
         <div class="confirm-actions">
-            <button class="btn btn-secondary" onclick="cerrarConfirm()">Cancelar</button>
-            <button class="btn btn-primary" id="confirmButton">Seguro</button>
+            <button class="btn btn-primary" id="confirmButton" style="display: none;">Seguro</button>
+            <button class="btn btn-primary" id="confirmButtonSecond" style="display: none;"></button>
         </div>
     </div>
 
@@ -2578,6 +2817,7 @@
         let colorTema = '#39ff14';
         let tipoPromoSeleccionado = null;
         let presupuesto = 0;
+        let ivaActual = 0; // IVA de la lista actual
         let temaActual = 'dark';
         let mostrarCampos = {
             marca: false,
@@ -2647,12 +2887,27 @@
         function init() {
             cargarConfiguracion();
             cargarProductos();
+            
+            // Recuperar lista cargada si existe
+            const listaGuardadaCargada = localStorage.getItem('listaActuallyCargada');
+            if (listaGuardadaCargada) {
+                try {
+                    listaActuallyCargada = JSON.parse(listaGuardadaCargada);
+                } catch (e) {
+                    listaActuallyCargada = null;
+                }
+            }
+            
             renderizarProductos();
+            actualizarIndicadorLista();
             actualizarTotales();
             renderizarListasGuardadas();
             aplicarTraducciones();
             actualizarEstadoPresupuesto();
             actualizarInfoIVAPresupuesto();
+            
+            // Cargar IVA guardado si existe
+            ivaActual = parseFloat(localStorage.getItem('ivaActual') || 0);
             
             // Mostrar footer en INICIO
             const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
@@ -2665,6 +2920,12 @@
 
         // Sidebar
         function toggleSidebar() {
+            // Bloquear si hay un modal confirmación activo
+            const confirmDialog = document.getElementById('confirmDialog');
+            if (confirmDialog && confirmDialog.classList.contains('active')) {
+                return;
+            }
+            
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             sidebar.classList.toggle('active');
@@ -2899,7 +3160,7 @@
             const nombre = document.getElementById('nombreProducto').value.trim();
             
             if (!nombre) {
-                alert('El nombre del producto es obligatorio');
+                mostrarAlertaModal('⚠️ Campo requerido', 'El nombre del producto es obligatorio');
                 return;
             }
 
@@ -2939,6 +3200,20 @@
             renderizarProductos();
             actualizarTotales();
             cerrarModalArticulo();
+        }
+
+        // Actualizar indicador de lista cargada
+        function actualizarIndicadorLista() {
+            const indicador = document.getElementById('indicadorListaCargada');
+            const nombreDisplay = document.getElementById('nombreListaCargadaDisplay');
+            
+            if (listaActuallyCargada) {
+                indicador.style.display = 'block';
+                nombreDisplay.textContent = listaActuallyCargada.nombre;
+            } else {
+                indicador.style.display = 'none';
+                nombreDisplay.textContent = '';
+            }
         }
 
         // Renderizar productos
@@ -3042,21 +3317,13 @@
                     <!-- Línea 4: Botones (Editar, Eliminar, Mover) -->
                     <div class="item-row-4">
                         <button class="item-btn-icon" onclick="event.stopPropagation(); abrirModalEditar(${index})" title="${trad.editar}" ${comprado ? 'disabled' : ''}>
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <ion-icon name="create"></ion-icon>
                         </button>
                         <button class="item-btn-icon" onclick="event.stopPropagation(); confirmarEliminar(${index})" title="${trad.eliminar}" ${comprado ? 'disabled' : ''}>
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 6H5H21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <ion-icon name="trash"></ion-icon>
                         </button>
-                        <button class="item-btn-icon item-btn-drag" title="Mover" ${comprado ? 'disabled' : ''}>
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 5h2v2H9V5zm0 6h2v2H9v-2zm0 6h2v2H9v-2zm6-12h2v2h-2V5zm0 6h2v2h-2v-2zm0 6h2v2h-2v-2z"/>
-                            </svg>
+                        <button class="item-btn-icon item-btn-drag" title="Mover">
+                            <ion-icon name="swap-vertical"></ion-icon>
                         </button>
                     </div>
                 </div>
@@ -3313,7 +3580,16 @@
                     productos = [];
                     guardarProductos();
                     renderizarProductos();
+                    actualizarIndicadorLista();
                     actualizarTotales();
+                    
+                    // Limpiar IVA
+                    ivaActual = 0;
+                    localStorage.removeItem('ivaActual');
+                    
+                    // Limpiar referencias a lista cargada o en edición
+                    listaEnEdicion = null;
+                    listaActuallyCargada = null;
                 }
             );
         }
@@ -3321,40 +3597,263 @@
         // Guardar lista
         function guardarLista() {
             if (productos.length === 0) {
-                alert('No hay artículos para guardar');
+                mostrarAlertaModal('⚠️ Lista vacía', 'No hay artículos para guardar');
                 return;
             }
-            document.getElementById('modalGuardar').classList.add('active');
-            document.body.classList.add('no-scroll');
+            
+            // Si estamos editando una lista O si cargamos una lista, mostrar opciones
+            if (listaEnEdicion || listaActuallyCargada) {
+                const nombreLista = listaEnEdicion ? listaEnEdicion.nombre : listaActuallyCargada.nombre;
+                const idLista = listaEnEdicion ? listaEnEdicion.id : listaActuallyCargada.id;
+                
+                mostrarConfirm(
+                    '¿Qué deseas hacer?',
+                    `Tienes dos opciones:\n1. Actualizar la lista "${nombreLista}" con los cambios actuales\n2. Guardar como una nueva lista (mantiene la original intacta)`,
+                    () => {
+                        // Opción 1: Actualizar lista existente
+                        const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+                        const ivaGuardado = parseFloat(localStorage.getItem('ivaActual') || 0);
+                        
+                        listas[idLista] = {
+                            nombre: nombreLista,
+                            fecha: new Date().toISOString(),
+                            productos: productos,
+                            total: productos.reduce((sum, p) => sum + p.total, 0),
+                            iva: ivaGuardado,
+                            presupuesto: presupuesto
+                        };
+                        
+                        localStorage.setItem('listasGuardadas', JSON.stringify(listas));
+                        
+                        // Guardar que esta lista sigue cargada
+                        localStorage.setItem('listaActuallyCargada', JSON.stringify(listaActuallyCargada || listaEnEdicion));
+                        
+                        // Limpiar solo listaEnEdicion (no listaActuallyCargada porque sigue siendo la lista cargada)
+                        listaEnEdicion = null;
+                        
+                        mostrarAlertaModal('✅ Actualización completada', `Lista "${nombreLista}" actualizada exitosamente`, () => {
+                            renderizarListasGuardadas();
+                            actualizarIndicadorLista();
+                        });
+                    },
+                    () => {
+                        // Opción 2: Guardar como nueva lista
+                        listaEnEdicion = null;
+                        // NO limpiar listaActuallyCargada aquí, se limpiará en confirmarGuardarLista si se confirma
+                        // Si se cancela el modal, la lista sigue siendo la cargada
+                        document.getElementById('modalGuardar').classList.add('active');
+                        document.body.classList.add('no-scroll');
+                        document.getElementById('nombreLista').focus();
+                        document.getElementById('mensajeErrorNombre').style.display = 'none';
+                        document.getElementById('btnGuardarLista').style.display = 'inline-block';
+                        document.getElementById('btnSobrescribir').style.display = 'none';
+                        window.listaDuplicada = null;
+                    },
+                    'Actualizar', 
+                    'Guardar como nueva'
+                );
+            } else {
+                // Comportamiento normal si no estamos editando ni cargando lista
+                document.getElementById('modalGuardar').classList.add('active');
+                document.body.classList.add('no-scroll');
+                document.getElementById('nombreLista').focus();
+                // Limpiar estado
+                document.getElementById('mensajeErrorNombre').style.display = 'none';
+                document.getElementById('btnGuardarLista').style.display = 'inline-block';
+                document.getElementById('btnSobrescribir').style.display = 'none';
+                window.listaDuplicada = null;
+            }
         }
 
         function cerrarModalGuardar() {
             document.getElementById('modalGuardar').classList.remove('active');
             document.body.classList.remove('no-scroll');
             document.getElementById('nombreLista').value = '';
+            document.getElementById('mensajeErrorNombre').style.display = 'none';
+            document.getElementById('btnGuardarLista').style.display = 'inline-block';
+            document.getElementById('btnSobrescribir').style.display = 'none';
+            window.listaDuplicada = null;
+        }
+
+        // Verificar en tiempo real si el nombre ya existe
+        function verificarNombreLista() {
+            const nombreLista = document.getElementById('nombreLista').value.trim();
+            const mensajeError = document.getElementById('mensajeErrorNombre');
+            const btnGuardar = document.getElementById('btnGuardarLista');
+            const btnSobrescribir = document.getElementById('btnSobrescribir');
+            
+            if (!nombreLista) {
+                mensajeError.style.display = 'none';
+                btnGuardar.style.display = 'inline-block';
+                btnSobrescribir.style.display = 'none';
+                window.listaDuplicada = null;
+                return;
+            }
+            
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            
+            // Buscar si existe una lista con ese nombre
+            const listaExistente = Object.entries(listas).find(([id, lista]) => 
+                lista.nombre.toLowerCase() === nombreLista.toLowerCase()
+            );
+            
+            if (listaExistente) {
+                // Mostrar error y botón de sobrescribir
+                mensajeError.style.display = 'block';
+                btnGuardar.style.display = 'none';
+                btnSobrescribir.style.display = 'inline-block';
+                window.listaDuplicada = listaExistente[0]; // Guardar el ID
+            } else {
+                // Ocultar error y mostrar botón normal
+                mensajeError.style.display = 'none';
+                btnGuardar.style.display = 'inline-block';
+                btnSobrescribir.style.display = 'none';
+                window.listaDuplicada = null;
+            }
         }
 
         function confirmarGuardarLista() {
             const nombreLista = document.getElementById('nombreLista').value.trim();
             
             if (!nombreLista) {
-                alert('El nombre de la lista es obligatorio');
+                mostrarAlertaModal('⚠️ Campo requerido', 'El nombre de la lista es obligatorio');
                 return;
             }
 
             const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            
+            // Validar límite de 10 listas
+            const listasArray = Object.entries(listas);
+            if (listasArray.length >= 10) {
+                mostrarAlertaModal('❌ Límite alcanzado', 'Solo puedes guardar un máximo de 10 listas. Debes eliminar una de las listas guardadas para poder guardar una nueva.\n\n💡 Tus datos en "Mis Gastos" se mantendrán aunque elimines una lista.');
+                return;
+            }
+            
             const id = Date.now().toString();
+            
+            // Obtener IVA actual si existe
+            const ivaGuardado = parseFloat(localStorage.getItem('ivaActual') || 0);
             
             listas[id] = {
                 nombre: nombreLista,
                 fecha: new Date().toISOString(),
                 productos: productos,
-                total: productos.reduce((sum, p) => sum + p.total, 0)
+                total: productos.reduce((sum, p) => sum + p.total, 0),
+                iva: ivaGuardado, // Incluir IVA en la lista
+                presupuesto: presupuesto // Incluir presupuesto en la lista
+            };
+
+            localStorage.setItem('listasGuardadas', JSON.stringify(listas));
+            
+            // Limpiar referencias a lista cargada o en edición (porque es una nueva lista)
+            listaEnEdicion = null;
+            listaActuallyCargada = null;
+            localStorage.removeItem('listaActuallyCargada');
+            
+            cerrarModalGuardar();
+            mostrarAlertaModal('✅ Éxito', 'Lista guardada exitosamente', () => {
+                renderizarListasGuardadas();
+                actualizarIndicadorLista();
+            });
+        }
+        
+        // Variable global para rastrear si estamos editando una lista
+        let listaEnEdicion = null;
+        // Variable para rastrear si se cargó una lista (sin intención de editar)
+        let listaActuallyCargada = null;
+        
+        // Función para editar una lista existente
+        function editarLista(id) {
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const lista = listas[id];
+            
+            if (lista) {
+                // Cargar la lista
+                productos = [...lista.productos];
+                guardarProductos();
+                
+                // Cargar presupuesto
+                if (lista.presupuesto && lista.presupuesto > 0) {
+                    presupuesto = lista.presupuesto;
+                    localStorage.setItem('presupuesto', presupuesto);
+                } else {
+                    presupuesto = 0;
+                    localStorage.removeItem('presupuesto');
+                }
+                
+                // Cargar IVA
+                if (lista.iva && lista.iva > 0) {
+                    ivaActual = lista.iva;
+                    localStorage.setItem('ivaActual', ivaActual);
+                } else {
+                    ivaActual = 0;
+                    localStorage.removeItem('ivaActual');
+                }
+                
+                // Guardar que estamos editando esta lista
+                listaEnEdicion = {
+                    id: id,
+                    nombre: lista.nombre
+                };
+                
+                renderizarProductos();
+                actualizarTotales();
+                actualizarEstadoPresupuesto();
+                
+                // Actualizar presupuesto visualmente
+                const totalGastado = productos
+                    .filter(p => p.comprado)
+                    .reduce((sum, p) => sum + p.total, 0);
+                actualizarPresupuesto(totalGastado);
+                
+                // Cambiar a la sección de inicio
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById('seccionInicio').classList.add('active');
+                
+                // Mostrar el contenedor fijo del fondo
+                document.querySelector('.bottom-fixed-container').classList.add('visible');
+                
+                // Actualizar menú activo
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector('.menu-item').classList.add('active');
+                
+                // Mostrar notificación de que se está editando
+                mostrarAlertaModal('<ion-icon name="newspaper" style="margin-right: 6px; vertical-align: middle;"></ion-icon>Editando', `Editando: "${lista.nombre}"\n\nCuando guardes, podrás elegir si actualizar esta lista o guardar como nueva.`, null, 'COMPRENDO');
+            }
+        }
+        function sobrescribirLista() {
+            const nombreLista = document.getElementById('nombreLista').value.trim();
+            const idDuplicada = window.listaDuplicada;
+            
+            if (!nombreLista || !idDuplicada) {
+                mostrarAlertaModal('❌ Error', 'Error al sobrescribir la lista');
+                return;
+            }
+            
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            
+            // Obtener IVA actual si existe
+            const ivaGuardado = parseFloat(localStorage.getItem('ivaActual') || 0);
+            
+            // Actualizar la lista existente con los datos nuevos
+            listas[idDuplicada] = {
+                nombre: nombreLista,
+                fecha: new Date().toISOString(),
+                productos: productos,
+                total: productos.reduce((sum, p) => sum + p.total, 0),
+                iva: ivaGuardado, // Incluir IVA en la lista
+                presupuesto: presupuesto // Incluir presupuesto en la lista
             };
 
             localStorage.setItem('listasGuardadas', JSON.stringify(listas));
             cerrarModalGuardar();
-            alert('Lista guardada exitosamente');
+            mostrarAlertaModal('✅ Éxito', 'Lista sobrescrita exitosamente', () => {
+                renderizarListasGuardadas();
+            });
         }
         
         // Presupuesto
@@ -3366,15 +3865,9 @@
             
             // Cambiar título según si hay presupuesto o no
             if (presupuesto > 0) {
-                titulo.innerHTML = `<svg style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>Editar Presupuesto`;
+                titulo.innerHTML = `<ion-icon name="wallet" style="margin-right: 6px;"></ion-icon>Editar Presupuesto`;
             } else {
-                titulo.innerHTML = `<svg style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>Agregar Presupuesto`;
+                titulo.innerHTML = `<ion-icon name="wallet" style="margin-right: 6px;"></ion-icon>Agregar Presupuesto`;
             }
             
             document.getElementById('modalPresupuesto').classList.add('active');
@@ -3384,6 +3877,169 @@
         function cerrarModalPresupuesto() {
             document.getElementById('modalPresupuesto').classList.remove('active');
             document.body.classList.remove('no-scroll');
+        }
+        
+        /* ============================================================
+           FUNCIONES: Modal Agregar IVA - OPCIÓN 4
+           Fase 1: Calcular con IVA
+           Fase 2: Confirmación de pago
+           ============================================================ */
+        function abrirModalAgregarIVA() {
+            document.getElementById('inputIVAModalTotal').value = '';
+            document.getElementById('totalConIVADisplay').style.display = 'none';
+            document.getElementById('modalAgregarIVA').classList.add('active');
+            document.body.classList.add('no-scroll');
+            document.getElementById('inputIVAModalTotal').focus();
+        }
+        
+        function cerrarModalAgregarIVA() {
+            document.getElementById('modalAgregarIVA').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+        
+        function actualizarEstadoBotonesIVA() {
+            const inputIVA = document.getElementById('inputIVAModalTotal');
+            const valorIVA = limpiarNumero(inputIVA.value);
+            const btnGuardarLista = document.getElementById('btnGuardarListaConIVA');
+            const totalConIVADisplay = document.getElementById('totalConIVADisplay');
+            const totalConIVAValor = document.getElementById('totalConIVAValor');
+            
+            if (valorIVA > 0) {
+                // Mostrar el total con IVA
+                const subtotal = productos.reduce((sum, p) => sum + p.total, 0);
+                const totalConIVA = subtotal + valorIVA;
+                
+                totalConIVADisplay.style.display = 'block';
+                totalConIVAValor.textContent = formatearPrecio(totalConIVA);
+                
+                // Habilitar botón
+                btnGuardarLista.disabled = false;
+                btnGuardarLista.style.opacity = '1';
+                btnGuardarLista.style.cursor = 'pointer';
+            } else {
+                totalConIVADisplay.style.display = 'none';
+                btnGuardarLista.disabled = true;
+                btnGuardarLista.style.opacity = '0.5';
+                btnGuardarLista.style.cursor = 'not-allowed';
+            }
+        }
+        
+        // FASE 1: Solo visualizar o guardar lista con IVA
+        function confirmarAgregarIVA() {
+            const inputIVA = document.getElementById('inputIVAModalTotal');
+            const valorIVA = limpiarNumero(inputIVA.value);
+            
+            if (valorIVA <= 0) {
+                mostrarAlerta('Por favor ingresa un valor válido para el IVA');
+                return;
+            }
+            
+            // Guardar el IVA para visualización
+            ivaActual = valorIVA;
+            localStorage.setItem('ivaActual', ivaActual);
+            
+            // Mostrar confirmación
+            mostrarAlerta('✓ Lista guardada. Subtotal + IVA visible en el resumen');
+            
+            cerrarModalAgregarIVA();
+        }
+        
+        // FASE 2: Abrir modal de confirmación de pago
+        function abrirConfirmacionPagoIVA() {
+            const inputIVA = document.getElementById('inputIVAModalTotal');
+            const valorIVA = limpiarNumero(inputIVA.value);
+            
+            if (valorIVA <= 0) {
+                mostrarAlerta('Por favor ingresa un valor válido para el IVA');
+                return;
+            }
+            
+            // Calcular valores para mostrar
+            const subtotal = productos.reduce((sum, p) => sum + p.total, 0);
+            const totalConIVA = subtotal + valorIVA;
+            
+            // Llenar datos en el modal de confirmación
+            document.getElementById('ivaConfirmSubtotal').textContent = formatearPrecio(subtotal);
+            document.getElementById('ivaConfirmIVA').textContent = formatearPrecio(valorIVA);
+            document.getElementById('ivaConfirmTotal').textContent = formatearPrecio(totalConIVA);
+            
+            // Fecha formateada
+            const hoy = new Date().toLocaleDateString('es-CO', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('ivaConfirmFecha').textContent = hoy;
+            
+            // Guardar el valor de IVA en variable temporal
+            window.ivaConfirmValue = valorIVA;
+            window.ivaConfirmSubtotal = subtotal;
+            
+            // IMPORTANTE: Cerrar el primer modal ANTES de abrir el segundo
+            // Esto asegura que solo haya UN popup activo a la vez
+            document.getElementById('modalAgregarIVA').classList.remove('active');
+            
+            // Abrir modal de confirmación
+            document.getElementById('modalConfirmacionPagoIVA').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
+        
+        function cerrarConfirmacionPagoIVA() {
+            document.getElementById('modalConfirmacionPagoIVA').classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+        
+        // FASE 3: Confirmar que SÍ pagó el IVA y registrar
+        function confirmarPagoIVA() {
+            const valorIVA = window.ivaConfirmValue;
+            const subtotal = window.ivaConfirmSubtotal;
+            
+            // Guardar en localStorage para visualización
+            ivaActual = valorIVA;
+            localStorage.setItem('ivaActual', ivaActual);
+            
+            // Registrar en historial de IVA
+            let historialIVA = JSON.parse(localStorage.getItem('historialIVA') || '[]');
+            
+            const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+            const listaActual = Object.keys(listas).length > 0 ? 
+                Object.values(listas)[Object.keys(listas).length - 1] : null;
+            
+            const nombreLista = listaActual ? listaActual.nombre : 'Compra sin lista';
+            const totalConIVA = subtotal + valorIVA;
+            
+            // Agregar nuevo registro
+            const nuevoRegistro = {
+                id: Date.now(),
+                fecha: new Date().toISOString(),
+                nombreLista: nombreLista,
+                ivaTotal: valorIVA,
+                totalProductos: subtotal,
+                totalConIVA: totalConIVA
+            };
+            
+            historialIVA.push(nuevoRegistro);
+            localStorage.setItem('historialIVA', JSON.stringify(historialIVA));
+            
+            // Mostrar confirmación (sin alerta que interrumpe)
+            // mostrarAlerta('✓ IVA registrado en tu historial: $' + formatearPrecio(valorIVA));
+            
+            // Cerrar ambos modales
+            cerrarConfirmacionPagoIVA();
+            cerrarModalAgregarIVA();
+            
+            // Actualizar tab de IVA
+            renderizarIVA();
+            
+            // Abrir modal de guardar lista
+            setTimeout(() => {
+                guardarLista();
+            }, 300);
+        }
+        
+        function mostrarAlerta(mensaje) {
+            alert(mensaje);
         }
         
         function confirmarPresupuesto() {
@@ -3438,6 +4094,93 @@
             }
         }
 
+        /* ============================================================
+           FUNCIÓN: Abrir modal para guardar presupuesto
+           Muestra confirmación con los datos del presupuesto actual
+           ============================================================ */
+        function abrirModalGuardarPresupuesto() {
+            if (presupuesto <= 0) {
+                mostrarAlertaModal('⚠️ Presupuesto requerido', 'No hay presupuesto establecido para guardar.');
+                return;
+            }
+
+            // Actualizar datos del modal
+            const gastoActual = productos.reduce((sum, p) => sum + p.total, 0);
+            const disponible = presupuesto - gastoActual;
+            
+            document.getElementById('presuGuardarMonto').textContent = '$' + presupuesto.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('gastoGuardarMonto').textContent = '$' + gastoActual.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Cambiar color del disponible según si hay disponible o no
+            const disponibleElement = document.getElementById('disponibleGuardarMonto');
+            if (disponible >= 0) {
+                disponibleElement.textContent = '$' + disponible.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                disponibleElement.style.color = 'var(--primary-color)';
+            } else {
+                disponibleElement.textContent = '-$' + Math.abs(disponible).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                disponibleElement.style.color = '#ff3232';
+            }
+            
+            document.getElementById('productosGuardarCantidad').textContent = productos.length;
+            
+            // Abrir modal
+            document.getElementById('modalGuardarPresupuesto').classList.add('active');
+        }
+
+        function cerrarModalGuardarPresupuesto() {
+            document.getElementById('modalGuardarPresupuesto').classList.remove('active');
+        }
+
+        /* ============================================================
+           FUNCIÓN: Confirmar guardar presupuesto
+           Guarda presupuesto, gasto real y disponible (SIN IVA)
+           ============================================================ */
+        function confirmarGuardarPresupuesto() {
+            const gastoActual = productos.reduce((sum, p) => sum + p.total, 0);
+            const presupuestos = JSON.parse(localStorage.getItem('presupuestosGuardados') || '[]');
+            
+            // Validar límite de 10 presupuestos
+            if (presupuestos.length >= 10) {
+                mostrarConfirm(
+                    'Límite de presupuestos alcanzado',
+                    'Solo puedes guardar un máximo de 10 presupuestos. Debes eliminar uno antes de guardar uno nuevo.',
+                    null,
+                    () => {
+                        cerrarModalGuardarPresupuesto();
+                    }
+                );
+                return;
+            }
+            
+            // Crear objeto del presupuesto
+            const presupuestoGuardado = {
+                id: Date.now(),
+                presupuesto: presupuesto,
+                gastoReal: gastoActual,
+                disponible: presupuesto - gastoActual,
+                fecha: new Date().toLocaleDateString('es-ES', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }),
+                cantidadProductos: productos.length
+            };
+
+            // Agregar a la lista
+            presupuestos.push(presupuestoGuardado);
+
+            // Guardar en localStorage
+            localStorage.setItem('presupuestosGuardados', JSON.stringify(presupuestos));
+
+            // Cerrar modal
+            cerrarModalGuardarPresupuesto();
+            
+            // Mostrar confirmación
+            mostrarAlertaModal('✅ Presupuesto guardado', 'Se registró en la pestaña "Presupuesto" de "Mis Gastos"');
+        }
+
         // Listas guardadas
         function renderizarListasGuardadas() {
             const container = document.getElementById('listasGuardadas');
@@ -3459,43 +4202,57 @@
                 return;
             }
 
-            container.innerHTML = listasArray.map(([id, lista]) => `
-                <div class="saved-list-card">
-                    <div class="saved-list-header">
-                        <div>
-                            <div class="saved-list-name">${lista.nombre}</div>
-                            <div class="saved-list-date">${new Date(lista.fecha).toLocaleDateString()}</div>
+            // Encabezado con checkbox "Seleccionar todo" y botón de eliminar seleccionadas
+            const headerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); border-radius: 12px 12px 0 0; margin-bottom: 12px;">
+                    <input type="checkbox" id="selectAllListas" onchange="seleccionarTodasLas()" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="selectAllListas" style="flex: 1; cursor: pointer; font-weight: 500; color: var(--text-primary);">Seleccionar todas</label>
+                    <button class="btn btn-delete" id="btnEliminarSeleccionadas" style="display: none;" onclick="eliminarSeleccionadas()">
+                        <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Eliminar seleccionadas
+                    </button>
+                </div>
+            `;
+
+            const listasHTML = listasArray.map(([id, lista]) => `
+                <div class="saved-list-card" style="display: flex; gap: 12px; align-items: flex-start;">
+                    <input type="checkbox" class="checkbox-lista" data-id="${id}" onchange="actualizarBtnEliminarSeleccionadas()" style="width: 18px; height: 18px; cursor: pointer; margin-top: 12px; flex-shrink: 0;">
+                    <div style="flex: 1;">
+                        <div class="saved-list-header">
+                            <div>
+                                <div class="saved-list-name">${lista.nombre}</div>
+                                <div class="saved-list-date">${new Date(lista.fecha).toLocaleDateString()}</div>
+                                <!-- Indicador de IVA si la lista tiene IVA -->
+                                ${lista.iva && lista.iva > 0 ? `<div class="iva-indicator">✓ Esta lista tiene IVA (${formatearPrecio(lista.iva)})</div>` : ''}
+                            </div>
                         </div>
-                    </div>
-                    <div class="saved-list-info">
-                        <span>${lista.productos.length} artículos</span>
-                        <span>•</span>
-                        <span>${formatearPrecio(lista.total)}</span>
-                    </div>
-                    <div class="saved-list-actions">
-                        <button class="btn btn-primary" onclick="cargarLista('${id}')">
-                            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Cargar
-                        </button>
-                        <button class="btn btn-delete" onclick="eliminarLista('${id}')">
-                            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Eliminar
-                        </button>
-                        <button class="btn btn-secondary" onclick="generarResumenLista('${id}')">
-                            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 12H15M9 16H15M17 21H7C6.46957 21 5.96086 20.7893 5.58579 20.4142C5.21071 20.0391 5 19.5304 5 19V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H12.586C12.8512 3.00006 13.1055 3.10545 13.293 3.293L18.707 8.707C18.8946 8.89449 18.9999 9.1488 19 9.414V19C19 19.5304 18.7893 20.0391 18.4142 20.4142C18.0391 20.7893 17.5304 21 17 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Generar resumen
-                        </button>
+                        <div class="saved-list-info">
+                            <span>${lista.productos.length} artículos</span>
+                            <span>•</span>
+                            <span>${formatearPrecio(lista.total)}</span>
+                        </div>
+                        <div class="saved-list-actions">
+                            <button class="btn btn-primary" onclick="cargarLista('${id}')">
+                                <ion-icon name="download" style="margin-right: 4px;"></ion-icon>
+                                Cargar
+                            </button>
+                            <button class="btn btn-delete" onclick="eliminarLista('${id}')">
+                                <ion-icon name="trash" style="margin-right: 4px;"></ion-icon>
+                                Eliminar
+                            </button>
+                            <button class="btn btn-secondary" onclick="generarResumenLista('${id}')">
+                                <ion-icon name="document" style="margin-right: 4px;"></ion-icon>
+                                Resumen
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
+
+            container.innerHTML = headerHTML + listasHTML;
         }
 
         function cargarLista(id) {
@@ -3503,15 +4260,46 @@
                 '¿Cargar lista?',
                 '¿Estás seguro de que deseas cargar esta lista? Se reemplazará la lista actual.',
                 () => {
+                    listaEnEdicion = null; // Limpiar estado de edición
                     const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
                     const lista = listas[id];
                     
                     if (lista) {
+                        // Guardar que cargamos una lista
+                        listaActuallyCargada = {
+                            id: id,
+                            nombre: lista.nombre
+                        };
+                        
+                        // Guardar en localStorage para persistencia
+                        localStorage.setItem('listaActuallyCargada', JSON.stringify(listaActuallyCargada));
+                        
                         productos = [...lista.productos];
                         guardarProductos();
+                        
+                        // IMPORTANTE: Cargar presupuesto ANTES de actualizar totales
+                        if (lista.presupuesto && lista.presupuesto > 0) {
+                            presupuesto = lista.presupuesto;
+                            localStorage.setItem('presupuesto', presupuesto);
+                        } else {
+                            presupuesto = 0;
+                            localStorage.removeItem('presupuesto');
+                        }
+                        
                         renderizarProductos();
+                        actualizarIndicadorLista();
                         actualizarTotales();
                         actualizarEstadoPresupuesto();
+                        
+                        // Actualizar presupuesto visualmente con el valor correcto
+                        const totalGastado = productos
+                            .filter(p => p.comprado)
+                            .reduce((sum, p) => sum + p.total, 0);
+                        actualizarPresupuesto(totalGastado);
+                        
+                        // Limpiar IVA al cargar una nueva lista
+                        ivaActual = 0;
+                        localStorage.removeItem('ivaActual');
                         
                         // Cambiar a la sección de inicio
                         document.querySelectorAll('.content-section').forEach(section => {
@@ -3527,8 +4315,6 @@
                             item.classList.remove('active');
                         });
                         document.querySelector('.menu-item').classList.add('active');
-                        
-                        alert('Lista cargada exitosamente');
                     }
                 }
             );
@@ -3541,6 +4327,69 @@
                 () => {
                     const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
                     delete listas[id];
+                    localStorage.setItem('listasGuardadas', JSON.stringify(listas));
+                    renderizarListasGuardadas();
+                }
+            );
+        }
+        
+        // Función para seleccionar/deseleccionar todas las listas
+        function seleccionarTodasLas() {
+            const checkboxSelectAll = document.getElementById('selectAllListas');
+            const checkboxesListas = document.querySelectorAll('.checkbox-lista');
+            
+            checkboxesListas.forEach(checkbox => {
+                checkbox.checked = checkboxSelectAll.checked;
+            });
+            
+            actualizarBtnEliminarSeleccionadas();
+        }
+        
+        // Función para actualizar visibilidad del botón de eliminar seleccionadas
+        function actualizarBtnEliminarSeleccionadas() {
+            const checkboxesListas = document.querySelectorAll('.checkbox-lista');
+            const btnEliminarSeleccionadas = document.getElementById('btnEliminarSeleccionadas');
+            const checkboxSelectAll = document.getElementById('selectAllListas');
+            
+            // Contar cuántas están seleccionadas
+            const seleccionadas = Array.from(checkboxesListas).filter(cb => cb.checked).length;
+            
+            // Mostrar botón si hay al menos una seleccionada
+            if (seleccionadas > 0) {
+                btnEliminarSeleccionadas.style.display = 'inline-flex';
+            } else {
+                btnEliminarSeleccionadas.style.display = 'none';
+            }
+            
+            // Actualizar estado del checkbox "Seleccionar todo"
+            checkboxSelectAll.checked = seleccionadas === checkboxesListas.length && checkboxesListas.length > 0;
+        }
+        
+        // Función para eliminar todas las listas seleccionadas
+        function eliminarSeleccionadas() {
+            const checkboxesListas = document.querySelectorAll('.checkbox-lista:checked');
+            const idsAEliminar = Array.from(checkboxesListas).map(cb => cb.dataset.id);
+            
+            if (idsAEliminar.length === 0) {
+                mostrarAlertaModal('⚠️ Selecciona listas', 'No hay listas seleccionadas');
+                return;
+            }
+            
+            const mensaje = idsAEliminar.length === 1 
+                ? '¿Estás seguro de que deseas eliminar esta lista?'
+                : `¿Estás seguro de que deseas eliminar ${idsAEliminar.length} listas?`;
+            
+            mostrarConfirm(
+                '¿Eliminar listas?',
+                mensaje,
+                () => {
+                    const listas = JSON.parse(localStorage.getItem('listasGuardadas') || '{}');
+                    
+                    // Eliminar todas las listas seleccionadas
+                    idsAEliminar.forEach(id => {
+                        delete listas[id];
+                    });
+                    
                     localStorage.setItem('listasGuardadas', JSON.stringify(listas));
                     renderizarListasGuardadas();
                 }
@@ -3585,6 +4434,9 @@
             document.getElementById('resumenItems').innerHTML = itemsHTML;
             
             // Summary
+            const ivaGuardado = parseFloat(localStorage.getItem('ivaActual') || 0);
+            const totalConIVA = ivaGuardado > 0 ? total + ivaGuardado : total;
+            
             const summaryHTML = `
                 ${presupuesto > 0 ? `
                     <div class="resumen-summary-row budget">
@@ -3600,9 +4452,15 @@
                     <span>Descuentos:</span>
                     <span>-${formatearPrecio(descuentos)}</span>
                 </div>
+                ${ivaGuardado > 0 ? `
+                    <div class="resumen-summary-row">
+                        <span>IVA:</span>
+                        <span>+${formatearPrecio(ivaGuardado)}</span>
+                    </div>
+                ` : ''}
                 <div class="resumen-summary-row total">
-                    <span>Total:</span>
-                    <span>${formatearPrecio(total)}</span>
+                    <span>${ivaGuardado > 0 ? 'Total con IVA:' : 'Total:'}</span>
+                    <span>${formatearPrecio(totalConIVA)}</span>
                 </div>
             `;
             
@@ -3918,6 +4776,11 @@
             });
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
             
+            // Destruir todos los gráficos antes de cambiar de tab
+            ['chartTopArticulos', 'chartCategorias', 'chartDescuentos', 'chartComparacion', 'chartPresupuesto'].forEach(chartId => {
+                destruirGrafico(chartId);
+            });
+            
             // Actualizar paneles
             document.querySelectorAll('.gastos-panel').forEach(panel => {
                 panel.classList.remove('active');
@@ -4154,7 +5017,7 @@
                     nombre: lista.nombre
                 }))
                 .sort((a, b) => a.fecha - b.fecha)
-                .slice(-6); // Últimas 6 listas
+                .slice(-2); // Últimas 2 listas (actual y penúltima)
             
             if (listasArray.length === 0) {
                 document.getElementById('statsComparacion').innerHTML = '<div class="empty-state-text">No hay listas guardadas para comparar</div>';
@@ -4216,6 +5079,26 @@
         
         // 5. Presupuesto vs Real
         function renderizarPresupuesto() {
+            // Crear dinámicamente los contenedores si no existen
+            const panelPresupuesto = document.getElementById('panel-presupuesto');
+            let chartContainer = document.getElementById('chartPresupuesto')?.parentElement;
+            let presupuestoAnalisisDiv = document.getElementById('presupuestoAnalisis');
+            
+            if (!chartContainer) {
+                chartContainer = document.createElement('div');
+                chartContainer.className = 'chart-container';
+                const canvas = document.createElement('canvas');
+                canvas.id = 'chartPresupuesto';
+                chartContainer.appendChild(canvas);
+                panelPresupuesto.appendChild(chartContainer);
+            }
+            
+            if (!presupuestoAnalisisDiv) {
+                presupuestoAnalisisDiv = document.createElement('div');
+                presupuestoAnalisisDiv.id = 'presupuestoAnalisis';
+                panelPresupuesto.appendChild(presupuestoAnalisisDiv);
+            }
+            
             destruirGrafico('chartPresupuesto');
             
             const totalActual = productos.reduce((sum, p) => sum + p.total, 0);
@@ -4225,7 +5108,14 @@
             document.getElementById('presupuestoPlaneado').textContent = formatearPrecio(presupuesto);
             document.getElementById('gastoReal').textContent = formatearPrecio(totalActual);
             document.getElementById('diferencia').textContent = formatearPrecio(Math.abs(diferencia));
-            document.getElementById('diferencia').style.color = diferencia >= 0 ? '#39ff14' : '#ff0080';
+            
+            // Aplicar color según tema
+            const tema = document.documentElement.getAttribute('data-theme');
+            if (tema === 'light') {
+                document.getElementById('diferencia').style.color = '#000000';
+            } else {
+                document.getElementById('diferencia').style.color = diferencia >= 0 ? '#39ff14' : '#ff0080';
+            }
             
             if (presupuesto === 0) {
                 document.getElementById('presupuestoAnalisis').innerHTML = '<div class="empty-state-text">No has establecido un presupuesto</div>';
@@ -4242,7 +5132,7 @@
                         data: [totalActual, Math.max(0, diferencia)],
                         backgroundColor: [
                             porcentajeUsado > 100 ? '#ff0080' : porcentajeUsado > 80 ? '#ffcc00' : '#39ff14',
-                            'rgba(255, 255, 255, 0.1)'
+                            'rgba(150, 150, 150, 0.4)'
                         ],
                         borderWidth: 0
                     }]
@@ -4346,28 +5236,31 @@
             const infoDiv = document.getElementById('ivaAgregadoInfo');
             const valorDiv = document.getElementById('ivaAgregadoValor');
             
-            if (ultimoRegistro) {
-                infoDiv.style.display = 'block';
-                valorDiv.textContent = formatearPrecio(ultimoRegistro.ivaTotal);
-            } else {
-                infoDiv.style.display = 'none';
+            // Solo actualizar si los elementos existen
+            if (infoDiv && valorDiv) {
+                if (ultimoRegistro) {
+                    infoDiv.style.display = 'block';
+                    valorDiv.textContent = formatearPrecio(ultimoRegistro.ivaTotal);
+                } else {
+                    infoDiv.style.display = 'none';
+                }
             }
         }
         
         function renderizarIVA() {
             const historialIVA = JSON.parse(localStorage.getItem('historialIVA') || '[]');
             
-            // Calcular estadísticas
+            // Calcular estadísticas (con TODOS los registros)
             const totalIVA = historialIVA.reduce((sum, reg) => sum + reg.ivaTotal, 0);
             const numeroCompras = historialIVA.length;
             const promedioIVA = numeroCompras > 0 ? totalIVA / numeroCompras : 0;
             
-            // Actualizar tarjetas
+            // Actualizar tarjetas con datos totales
             document.getElementById('totalIVAPagado').textContent = formatearPrecio(totalIVA);
             document.getElementById('numeroComprasIVA').textContent = numeroCompras.toString();
             document.getElementById('promedioIVA').textContent = formatearPrecio(promedioIVA);
             
-            // Renderizar lista de compras
+            // Renderizar lista de compras - SOLO ÚLTIMOS 10 REGISTROS
             const listaDiv = document.getElementById('listaIVACompras');
             
             if (historialIVA.length === 0) {
@@ -4379,10 +5272,14 @@
                 return;
             }
             
-            // Mostrar en orden inverso (más recientes primero)
-            const registrosOrdenados = [...historialIVA].reverse();
+            // Mostrar en orden inverso (más recientes primero) - SOLO ÚLTIMOS 5
+            const registrosOrdenados = [...historialIVA].reverse().slice(0, 5);
             
-            listaDiv.innerHTML = registrosOrdenados.map(reg => {
+            // Mostrar información sobre cuántos registros se están viendo
+            const totalRegistros = historialIVA.length;
+            const avisoRegistros = totalRegistros > 5 ? `<p style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 8px; background: rgba(57, 255, 20, 0.05); border-radius: 6px; margin-bottom: 12px;">Mostrando últimos 5 de ${totalRegistros} registros</p>` : '';
+            
+            listaDiv.innerHTML = avisoRegistros + registrosOrdenados.map(reg => {
                 const fecha = new Date(reg.fecha).toLocaleDateString('es-ES', {
                     year: 'numeric',
                     month: 'short',
@@ -4403,7 +5300,7 @@
                             </p>
                         </div>
                         <div style="text-align: right;">
-                            <p style="font-size: 13px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">
+                            <p style="font-size: 13px; font-weight: 700; margin-bottom: 4px;" class="iva-indicator">
                                 IVA: ${formatearPrecio(reg.ivaTotal)}
                             </p>
                             <p style="font-size: 11px; color: var(--text-muted);">
@@ -4415,17 +5312,6 @@
             }).join('');
         }
         
-        function limpiarHistorialIVA() {
-            mostrarConfirm(
-                '¿Limpiar historial de IVA?',
-                '¿Estás seguro de que deseas eliminar todo el historial de IVA? Esta acción no se puede deshacer.',
-                () => {
-                    localStorage.removeItem('historialIVA');
-                    renderizarIVA();
-                    actualizarInfoIVAPresupuesto();
-                }
-            );
-        }
 
         // Configuración
         function cambiarIdioma() {
@@ -4439,13 +5325,13 @@
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
-                if (index === 0) btn.innerHTML = `<svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21V13H7V21M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${trad.guardarLista}`;
-                else if (index === 1) btn.innerHTML = `<svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${trad.limpiarTodo}`;
+                if (index === 0) btn.innerHTML = `<ion-icon name="save" style="margin-right: 4px;"></ion-icon>${trad.guardarLista}`;
+                else if (index === 1) btn.innerHTML = `<ion-icon name="trash" style="margin-right: 4px;"></ion-icon>${trad.limpiarTodo}`;
             });
             
             // Traducir botón agregar artículo
             const btnAgregar = document.querySelector('.btn-add-item');
-            if (btnAgregar) btnAgregar.innerHTML = `<svg style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>${trad.agregarArticulo}`;
+            if (btnAgregar) btnAgregar.innerHTML = `<ion-icon name="add" style="margin-right: 8px;"></ion-icon>${trad.agregarArticulo}`;
             
             // Traducir títulos de botones editar y eliminar
             document.querySelectorAll('.item-btn-icon').forEach((btn, index) => {
@@ -4480,23 +5366,79 @@
             return parseFloat(texto.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
         }
 
-        function mostrarConfirm(titulo, texto, callback) {
+        function mostrarConfirm(titulo, texto, callback, cancelCallback, textoBtnSi = 'Seguro', textoBtnNo = 'Cancelar') {
             document.getElementById('confirmTitle').textContent = titulo;
             document.getElementById('confirmText').textContent = texto;
+            document.getElementById('confirmDialogOverlay').classList.add('active');
             document.getElementById('confirmDialog').classList.add('active');
-            document.getElementById('sidebarOverlay').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('blocked');
             document.body.classList.add('no-scroll');
             
-            document.getElementById('confirmButton').onclick = () => {
-                callback();
-                cerrarConfirm();
-            };
+            const confirmBtn = document.getElementById('confirmButton');
+            const confirmBtnSecond = document.getElementById('confirmButtonSecond');
+            
+            // Si hay un segundo callback, mostrar dos botones verticales
+            if (cancelCallback && typeof cancelCallback === 'function') {
+                // Modo dos botones vertical
+                confirmBtn.style.display = 'inline-block';
+                confirmBtnSecond.style.display = 'inline-block';
+                
+                confirmBtn.innerHTML = textoBtnSi;
+                confirmBtnSecond.innerHTML = textoBtnNo;
+                
+                confirmBtn.onclick = () => {
+                    callback();
+                    cerrarConfirm();
+                };
+                
+                confirmBtnSecond.onclick = () => {
+                    cancelCallback();
+                    cerrarConfirm();
+                };
+            } else {
+                // Modo un botón (compatible con versiones anteriores)
+                confirmBtn.style.display = 'inline-block';
+                confirmBtnSecond.style.display = 'none';
+                
+                confirmBtn.textContent = textoBtnSi;
+                
+                confirmBtn.onclick = () => {
+                    callback();
+                    cerrarConfirm();
+                };
+            }
         }
 
         function cerrarConfirm() {
+            document.getElementById('confirmDialogOverlay').classList.remove('active');
             document.getElementById('confirmDialog').classList.remove('active');
-            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('blocked');
             document.body.classList.remove('no-scroll');
+        }
+        
+        // Función para mostrar alertas en modal
+        function mostrarAlertaModal(titulo, mensaje, callback, textoBotón = 'Aceptar') {
+            document.getElementById('confirmTitle').innerHTML = titulo;
+            document.getElementById('confirmText').textContent = mensaje;
+            document.getElementById('confirmDialogOverlay').classList.add('active');
+            document.getElementById('confirmDialog').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('blocked');
+            document.body.classList.add('no-scroll');
+            
+            const confirmBtn = document.getElementById('confirmButton');
+            const confirmBtnSecond = document.getElementById('confirmButtonSecond');
+            
+            // Para alertas, mostramos solo el botón de aceptar
+            confirmBtn.style.display = 'inline-block';
+            confirmBtnSecond.style.display = 'none';
+            confirmBtn.innerHTML = textoBotón;
+            
+            confirmBtn.onclick = () => {
+                if (callback) {
+                    callback();
+                }
+                cerrarConfirm();
+            };
         }
 
         // LocalStorage
@@ -4624,7 +5566,7 @@
                     const btnAplicar = document.getElementById('btnAplicarCambios');
                     if (btnAplicar) btnAplicar.style.display = 'none';
                     
-                    alert('Cambios aplicados exitosamente');
+                    mostrarAlertaModal('✅ Cambios guardados', 'Cambios aplicados exitosamente');
                 },
                 () => {
                     // Cancelar - restaurar valores
@@ -4686,8 +5628,108 @@
             }
         });
 
+        // Formateo de IVA en modal
+        document.getElementById('inputIVAModalTotal').addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/[^\d,]/g, '');
+            if (valor) {
+                const partes = valor.split(',');
+                partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                e.target.value = partes.join(',');
+            }
+        });
+
+        // Bloquear interacciones fuera del modal - NO permitir cerrar con ESC
+        // Los modales solo se cierran con botones explícitos (X, Cancelar, etc.)
+        
+        // Función para verificar si hay un modal activo
+        function hayModalActivo() {
+            const modales = [
+                'modalArticulo',
+                'modalGuardar', 
+                'modalPresupuesto',
+                'modalGuardarPresupuesto',
+                'modalAgregarIVA',
+                'modalConfirmacionPagoIVA',
+                'modalResumen',
+                'confirmDialog'
+            ];
+            
+            return modales.some(id => {
+                const elem = document.getElementById(id);
+                return elem && elem.classList.contains('active');
+            });
+        }
+        
+        // Bloquear teclas cuando hay modal activo
+        document.addEventListener('keydown', function(e) {
+            if (!hayModalActivo()) return;
+            
+            // Prevenir ESC
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                return false;
+            }
+        }, true); // Usar capture phase para prevenir bubbling
+        
+        // Bloquear clics en elementos fuera del modal (pero permitir botones)
+        document.addEventListener('click', function(e) {
+            if (!hayModalActivo()) return;
+            
+            // No bloquear clics en elementos interactivos
+            if (e.target.closest('button, input, textarea, select, a, [role="button"]')) {
+                return;
+            }
+            
+            // Encontrar el modal activo
+            const modales = [
+                { id: 'modalArticulo', selector: '.modal-content' },
+                { id: 'modalGuardar', selector: '.modal-content' },
+                { id: 'modalPresupuesto', selector: '.modal-content' },
+                { id: 'modalGuardarPresupuesto', selector: '.modal-content' },
+                { id: 'modalAgregarIVA', selector: '.modal-content' },
+                { id: 'modalConfirmacionPagoIVA', selector: '.modal-content' },
+                { id: 'modalResumen', selector: '.resumen-container' },
+                { id: 'confirmDialog', selector: '.confirm-dialog' }
+            ];
+            
+            const modalActivo = modales.find(m => {
+                const elem = document.getElementById(m.id);
+                return elem && elem.classList.contains('active');
+            });
+            
+            if (modalActivo) {
+                const contenido = document.querySelector(`#${modalActivo.id} ${modalActivo.selector}`);
+                if (contenido && !contenido.contains(e.target)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+        }, true); // Usar capture phase
+        
+        // Bloquear scroll cuando hay modal activo
+        document.addEventListener('wheel', function(e) {
+            if (hayModalActivo() && !e.target.closest('.modal-content, .resumen-container, .confirm-dialog')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (hayModalActivo() && !e.target.closest('.modal-content, .resumen-container, .confirm-dialog')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
         // Inicializar app
         window.onload = init;
+        
+        // Asegurar que Ionicons se renderice correctamente
+        document.addEventListener('DOMContentLoaded', () => {
+            // Forzar renderizado de los iconos
+            if (window.ionicons) {
+                window.ionicons.render();
+            }
+        });
     </script>
 </body>
 </html>
