@@ -31,6 +31,7 @@
             --text-muted: #808080;
             --bottom-fixed-height: 0px;
             --footer-height: 0px;
+            --main-content-height: calc(100vh - 60px);
         }
         
         [data-theme="light"] {
@@ -311,7 +312,7 @@
             margin-top: 60px;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 60px);
+            height: var(--main-content-height);
             overflow: hidden !important;
         }
         
@@ -346,7 +347,6 @@
             overflow-y: hidden !important;
             overflow-x: hidden !important;
             gap: 0;
-            padding-bottom: var(--footer-height);
         }
         
         /* Otras secciones - scroll y padding consistente */
@@ -2552,13 +2552,19 @@
 
         function actualizarAltoBottomFixedContainer() {
             const bottomFixedContainer = document.querySelector('.bottom-fixed-container');
+            const mainContent = document.querySelector('.main-content');
+            
             if (bottomFixedContainer && bottomFixedContainer.classList.contains('visible')) {
                 const altura = bottomFixedContainer.offsetHeight;
                 document.documentElement.style.setProperty('--bottom-fixed-height', altura + 'px');
                 document.documentElement.style.setProperty('--footer-height', altura + 'px');
+                // Ajustar la altura de main-content para que no se superponga con el footer
+                document.documentElement.style.setProperty('--main-content-height', `calc(100vh - 60px - ${altura}px)`);
             } else {
                 document.documentElement.style.setProperty('--bottom-fixed-height', '0px');
                 document.documentElement.style.setProperty('--footer-height', '0px');
+                // Restaurar la altura normal de main-content
+                document.documentElement.style.setProperty('--main-content-height', 'calc(100vh - 60px)');
             }
         }
 
