@@ -5357,6 +5357,10 @@
             // Traducir label Campos del Formulario
             const camposFormulario = document.getElementById('camposDelFormulario');
             if (camposFormulario) camposFormulario.textContent = trad.camposDelFormulario;
+
+            // Traducir label Formato de Precios
+            const formatoPrecios = document.getElementById('formatoDePrecios');
+            if (formatoPrecios) formatoPrecios.textContent = trad.formatoDePrecios;
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
@@ -5375,9 +5379,7 @@
                 else if (mod === 1) btn.setAttribute('title', trad.eliminar);
             });
 
-            // Traducir label Formato de Precios
-            const formatoPrecios = document.getElementById('formatoDePrecios');
-            if (formatoPrecios) formatoPrecios.textContent = trad.formatoDePrecios;
+            
 
             
             // Re-renderizar productos
