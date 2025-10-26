@@ -5353,8 +5353,8 @@
             if (labelIdioma) labelIdioma.textContent = `🌍 ${trad.idioma}`;
 
             // Traducir label Campos del Formulario
-            const labelcamposFormulario = document.getElementById('camposDelFormulario');
-            if (labelcamposFormulario) labelMiPalabra.textContent = trad.camposDelFormulario;
+            const camposFormulario = document.getElementById('camposDelFormulario');
+            if (camposFormulario) camposFormulario.textContent = trad.camposDelFormulario;
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
