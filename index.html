@@ -2375,28 +2375,28 @@
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" id="checkMarca" onchange="toggleCampo('marca')">
-                        <span>Marca</span>
+                        <span id="marca">Marca</span>
                     </label>
                 </div>
                 
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" id="checkCategoria" onchange="toggleCampo('categoria')">
-                        <span>Categoría</span>
+                        <span id="categoria">Categoría</span>
                     </label>
                 </div>
                 
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" id="checkNota" onchange="toggleCampo('nota')">
-                        <span>Nota</span>
+                        <span id="nota">Nota</span>
                     </label>
                 </div>
                 
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" id="checkPromociones" onchange="toggleCampo('promociones')">
-                        <span>Promociones/Descuentos</span>
+                        <span id="promocionesDescuentos">Promociones/Descuentos</span>
                     </label>
                 </div>
             </div>
@@ -2885,7 +2885,11 @@
                 eliminar: 'Eliminar',
                 idioma: 'Idioma',
                 camposDelFormulario: 'Campos del Formulario',
-                formatoDePrecios: 'Formato de Precios'
+                formatoDePrecios: 'Formato de Precios',
+                marca: 'Marca',
+                categoria: 'Categororía',
+                nota: 'Nota',
+                promocionesDescuentos: 'Promociones/Descuentos'
             },
             en: {
                 inicio: 'Home',
@@ -2903,7 +2907,11 @@
                 eliminar: 'Delete',
                 idioma: 'Lenguage',
                 camposDelFormulario: 'Form Fields',
-                formatoDePrecios: 'Pricing format'
+                formatoDePrecios: 'Pricing format',
+                marca: 'Brand',
+                categoria: 'Category',
+                nota: 'Note',
+                promocionesDescuentos: 'Promotions/Discounts'
             }
         };
 
@@ -5361,6 +5369,22 @@
             // Traducir label Formato de Precios
             const formatoPrecios = document.getElementById('formatoDePrecios');
             if (formatoPrecios) formatoPrecios.textContent = trad.formatoDePrecios;
+
+            // Traducir label Marca
+            const labelMarca = document.getElementById('marca');
+            if (labelMarca) labelMarca.textContent = trad.marca;
+
+            // Traducir label Categoría
+            const labelCategoria = document.getElementById('categoria');
+            if (labelCategoria) labelCategoria.textContent = trad.categoria;
+            
+            // Traducir label Nota
+            const labelNota = document.getElementById('nota');
+            if (labelNota) labelNota.textContent = trad.nota;
+
+            // Traducir label Promociones/Descuentos
+            const labelPromo = document.getElementById('promocionesDescuentos');
+            if (labelPromo) labelPromo.textContent = trad.promocionesDescuentos;
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
