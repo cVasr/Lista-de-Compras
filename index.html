@@ -2891,7 +2891,8 @@
                 nota: 'Nota',
                 promocionesDescuentos: 'Promociones/Descuentos',
                 aplicarCambios: 'Aplicar cambios',
-                cancelar: 'Cancelar'
+                cancelar: 'Cancelar',
+                mostrarDecimales: 'Mostrar decimales'
             },
             en: {
                 inicio: 'Home',
@@ -2915,7 +2916,8 @@
                 nota: 'Note',
                 promocionesDescuentos: 'Promotions/Discounts',
                 aplicarCambios: 'Apply changes',
-                cancelar: 'Cancel'
+                cancelar: 'Cancel',
+                mostrarDecimales: 'Show decimals'
             }
         };
 
@@ -5403,7 +5405,6 @@
                 btn.textContent = trad.cancelar;
             });
 
-            
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
                 if (index === 0) btn.innerHTML = `<ion-icon name="save" style="margin-right: 4px;"></ion-icon>${trad.guardarLista}`;
