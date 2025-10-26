@@ -3594,7 +3594,6 @@
                     productos = [];
                     guardarProductos();
                     renderizarProductos();
-                    actualizarIndicadorLista();
                     actualizarTotales();
                     
                     // Limpiar IVA
@@ -3604,6 +3603,10 @@
                     // Limpiar referencias a lista cargada o en edición
                     listaEnEdicion = null;
                     listaActuallyCargada = null;
+                    localStorage.removeItem('listaActuallyCargada');
+                    
+                    // Actualizar indicador
+                    actualizarIndicadorLista();
                 }
             );
         }
