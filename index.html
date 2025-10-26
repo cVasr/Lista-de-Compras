@@ -2406,7 +2406,7 @@
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" id="checkDecimales" onchange="toggleDecimales()">
-                        <span>Mostrar decimales ($58,000.00)</span>
+                        <span id="mostrarDecimales">Mostrar decimales ($17,000.00)</span>
                     </label>
                 </div>
             </div>
@@ -2573,7 +2573,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="cerrarModalArticulo()">Cancelar</button>
+                <button class="btn btn-secondary btn-cancelar" onclick="cerrarModalArticulo()">Cancelar</button>
                 <button class="btn btn-primary" onclick="confirmarArticulo()">Confirmar</button>
             </div>
         </div>
@@ -2605,7 +2605,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="cerrarModalGuardar()">Cancelar</button>
+                <button class="btn btn-secondary btn-cancelar" onclick="cerrarModalGuardar()">Cancelar</button>
                 <button class="btn btn-primary" id="btnGuardarLista" onclick="confirmarGuardarLista()">Guardar</button>
                 <button class="btn btn-delete" id="btnSobrescribir" style="display: none;" onclick="sobrescribirLista()">Sobrescribir</button>
             </div>
@@ -2634,7 +2634,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="cerrarModalPresupuesto()">Cancelar</button>
+                <button class="btn btn-secondary btn-cancelar" onclick="cerrarModalPresupuesto()">Cancelar</button>
                 <button class="btn btn-primary" onclick="confirmarPresupuesto()">Guardar</button>
             </div>
         </div>
@@ -2683,7 +2683,7 @@
                 </p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="cerrarModalGuardarPresupuesto()">Cancelar</button>
+                <button class="btn btn-secondary btn-cancelar" onclick="cerrarModalGuardarPresupuesto()">Cancelar</button>
                 <button class="btn btn-primary" onclick="confirmarGuardarPresupuesto()">Guardar Presupuesto</button>
             </div>
         </div>
@@ -2722,7 +2722,7 @@
                     Guardar lista con IVA
                 </button>
                 <div style="display: flex; gap: 12px;">
-                    <button class="btn btn-secondary" onclick="cerrarModalAgregarIVA()" style="flex: 1;">Cancelar</button>
+                    <button class="btn btn-secondary btn-cancelar" onclick="cerrarModalAgregarIVA()" style="flex: 1;">Cancelar</button>
                     <button class="btn btn-secondary" onclick="confirmarAgregarIVA()" style="flex: 1;">Solo visualizar</button>
                 </div>
             </div>
@@ -2889,7 +2889,9 @@
                 marca: 'Marca',
                 categoria: 'Categororía',
                 nota: 'Nota',
-                promocionesDescuentos: 'Promociones/Descuentos'
+                promocionesDescuentos: 'Promociones/Descuentos',
+                aplicarCambios: 'Aplicar cambios',
+                cancelar: 'Cancelar',
             },
             en: {
                 inicio: 'Home',
@@ -2911,7 +2913,9 @@
                 marca: 'Brand',
                 categoria: 'Category',
                 nota: 'Note',
-                promocionesDescuentos: 'Promotions/Discounts'
+                promocionesDescuentos: 'Promotions/Discounts',
+                aplicarCambios: 'Apply changes',
+                cancelar: 'Cancel',
             }
         };
 
@@ -5385,6 +5389,20 @@
             // Traducir label Promociones/Descuentos
             const labelPromo = document.getElementById('promocionesDescuentos');
             if (labelPromo) labelPromo.textContent = trad.promocionesDescuentos;
+
+            // Traducir label Mostrar decimales
+            const labelmosDecimales = document.getElementById('mostrarDecimales');
+            if (labelmosDecimales) labelmosDecimales.textContent = trad.mostrarDecimales;
+
+            // Traducir label Selecciona qué campos quieres mostrar al agregar artículos
+            const labelcamposArticulos = document.getElementById('camposArticulos');
+            if (labelcamposArticulos) labelcamposArticulos.textContent = trad.camposArticulos;
+
+            // Traducir botones Cancelar
+            document.querySelectorAll('.btn-cancelar').forEach(btn => {
+                btn.textContent = trad.cancelar;
+            });
+
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
@@ -5598,7 +5616,7 @@
                 btnAplicar.className = 'btn-aplicar-container';
                 btnAplicar.innerHTML = `
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="confirmarAplicarCambios()">
+                        <button class="btn btn-primary" onclick="confirmarAplicarCambios()" id="aplicarCambios">
                             Aplicar Cambios
                         </button>
                         <button class="btn btn-secondary" onclick="cancelarCambios()">
