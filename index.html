@@ -2370,7 +2370,7 @@
 
             <div class="config-section">
                 <div class="config-title" id="camposDelFormulario">📝 Campos del Formulario</div>
-                <div class="config-description">Selecciona qué campos quieres mostrar al agregar artículos</div>
+                <div class="config-description" id="seleccionarCampos">Selecciona qué campos quieres mostrar al agregar artículos</div>
                 
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
@@ -2892,7 +2892,8 @@
                 promocionesDescuentos: 'Promociones/Descuentos',
                 aplicarCambios: 'Aplicar cambios',
                 cancelar: 'Cancelar',
-                mostrarDecimales: 'Mostrar decimales ($17,000.00)'
+                mostrarDecimales: 'Mostrar decimales ($17,000.00)',
+                seleccionarCampos: 'Selecciona qué campos quieres mostrar al agregar artículos'
             },
             en: {
                 inicio: 'Home',
@@ -2917,7 +2918,8 @@
                 promocionesDescuentos: 'Promotions/Discounts',
                 aplicarCambios: 'Apply changes',
                 cancelar: 'Cancel',
-                mostrarDecimales: 'Show decimals ($17,000.00)'
+                mostrarDecimales: 'Show decimals ($17,000.00)',
+                seleccionarCampos: 'Select which fields you want to display when adding items'
             }
         };
 
@@ -5397,8 +5399,8 @@
             if (labelmosDecimales) labelmosDecimales.textContent = trad.mostrarDecimales;
 
             // Traducir label Selecciona qué campos quieres mostrar al agregar artículos
-            const labelcamposArticulos = document.getElementById('camposArticulos');
-            if (labelcamposArticulos) labelcamposArticulos.textContent = trad.camposArticulos;
+            const labelseleccionarCampos = document.getElementById('seleccionarCampos');
+            if (labelseleccionarCampos) labelseleccionarCampos.textContent = trad.seleccionarCampos;
 
             // Traducir botones Cancelar
             document.querySelectorAll('.btn-cancelar').forEach(btn => {
