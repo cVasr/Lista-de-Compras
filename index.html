@@ -2402,7 +2402,7 @@
             </div>
 
             <div class="config-section">
-                <div class="config-title">💰 Formato de Precios</div>
+                <div class="config-title" id="FormatoDePrecios">💰 Formato de Precios</div>
                 <div class="config-option config-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" id="checkDecimales" onchange="toggleDecimales()">
@@ -2884,7 +2884,8 @@
                 editar: 'Editar',
                 eliminar: 'Eliminar',
                 idioma: 'Idioma',
-                camposDelFormulario: 'Campos del Formulario'
+                camposDelFormulario: 'Campos del Formulario',
+                formatoDePrecios: 'Formato de Precios'
             },
             en: {
                 inicio: 'Home',
@@ -2902,6 +2903,7 @@
                 eliminar: 'Delete',
                 idioma: 'Lenguage',
                 camposDelFormulario: 'Form Fields'
+                formatoDePrecios: 'Pricing format'
             }
         };
 
@@ -5372,6 +5374,11 @@
                 if (mod === 0) btn.setAttribute('title', trad.editar);
                 else if (mod === 1) btn.setAttribute('title', trad.eliminar);
             });
+
+            // Traducir label Formato de Precios
+            const formatoPrecios = document.getElementById('formatoDePrecios');
+            if (formatoPrecios) formatoPrecios.textContent = trad.formatoDePrecios;
+
             
             // Re-renderizar productos
             renderizarProductos();
