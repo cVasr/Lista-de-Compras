@@ -2369,7 +2369,7 @@
             </div>
 
             <div class="config-section">
-                <div class="config-title">📝 Campos del Formulario</div>
+                <div class="config-title" id="camposDelFormulario">📝 Campos del Formulario</div>
                 <div class="config-description">Selecciona qué campos quieres mostrar al agregar artículos</div>
                 
                 <div class="config-option config-checkbox">
@@ -2883,7 +2883,8 @@
                 sinArticulos: 'No hay artículos en la lista',
                 editar: 'Editar',
                 eliminar: 'Eliminar',
-                idioma: 'Idioma'
+                idioma: 'Idioma',
+                camposDelFormulario: 'Campos del Formulario'
             },
             en: {
                 inicio: 'Home',
@@ -2899,7 +2900,8 @@
                 sinArticulos: 'No items in the list',
                 editar: 'Edit',
                 eliminar: 'Delete',
-                idioma: 'Lenguage'
+                idioma: 'Lenguage',
+                camposDelFormulario: 'Form Fields'
             }
         };
 
@@ -5349,6 +5351,10 @@
             // Traducir label Idioma
             const labelIdioma = document.getElementById('labelIdioma');
             if (labelIdioma) labelIdioma.textContent = `🌍 ${trad.idioma}`;
+
+            // Traducir label Campos del Formulario
+            const labelcamposFormulario = document.getElementById('camposDelFormulario');
+            if (labelcamposFormulario) labelMiPalabra.textContent = trad.camposDelFormulario;
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
