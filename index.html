@@ -2359,7 +2359,7 @@
         <!-- Configuración -->
         <div class="content-section" id="seccionConfiguracion">
             <div class="config-section">
-                <div class="config-title">🌍 Idioma</div>
+                <div class="config-title" id="labelIdioma">🌍 Idioma</div>
                 <div class="config-option">
                     <select class="form-input" id="selectIdioma" onchange="cambiarIdiomaTemp()">
                         <option value="es">Español</option>
@@ -5345,6 +5345,10 @@
 
         function aplicarTraducciones() {
             const trad = traducciones[idioma];
+
+            // Traducir label Idioma
+            const labelIdioma = document.getElementById('labelIdioma');
+            if (labelIdioma) labelIdioma.textContent = `🌍 ${trad.idioma}`;
             
             // Traducir botones Guardar y Limpiar
             document.querySelectorAll('.action-buttons-top .btn').forEach((btn, index) => {
