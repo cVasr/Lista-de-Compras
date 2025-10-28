@@ -2505,16 +2505,16 @@
                     <div class="form-row">
                         <input type="number" class="form-input" id="cantidadProducto" placeholder="1" min="0.01" step="0.01">
                         <select class="form-input" id="tipoUnidad">
-                            <option value="unidad">Unidad</option>
-                            <option value="libras">Libra</option>
-                            <option value="kilogramos">Kilogramo</option>
-                            <option value="gramos">Gramo</option>
-                            <option value="litros">Litros</option>
-                            <option value="mililitros">Mililitros</option>
-                            <option value="galones">Galones</option>
-                            <option value="lata">Lata</option>
-                            <option value="paquete">Paquete</option>
-                            <option value="botella">Botella</option>
+                            <option value="unidad" id="unidad">Unidad</option>
+                            <option value="libras" id="libra">Libra</option>
+                            <option value="kilogramos" id="kilogramo">Kilogramo</option>
+                            <option value="gramos" id="gramo">Gramo</option>
+                            <option value="litros" id="litros">Litros</option>
+                            <option value="mililitros" id="mililitros">Mililitros</option>
+                            <option value="galones" id="galones">Galones</option>
+                            <option value="lata" id="lata">Lata</option>
+                            <option value="paquete" id="paquete">Paquete</option>
+                            <option value="botella" id="botella">Botella</option>
                         </select>
                     </div>
                 </div>
@@ -2906,7 +2906,18 @@
                 panaderia: '🍞 Panadería',
                 cereales: '🌾 Cereales',
                 papeleria: '📝 Papelería',
-                salud: '💊 Salud'
+                salud: '💊 Salud',
+                // Unidad
+                unidad: 'Unidad',
+                libra: 'Libra',
+                kilogramo: 'Kilogramo',
+                gramo: 'Gramo',
+                litros: 'Litros',
+                mililitros: 'Mililitros',
+                galones: 'Galones',
+                lata: 'Lata',
+                paquete: 'Paquete',
+                botella: 'Botella',
             },
             en: {
                 inicio: 'Home',
@@ -2942,7 +2953,18 @@
                 panaderia: '🍞 Bakery',
                 cereales: '🌾 Cereals',
                 papeleria: '📝 Stationery',
-                salud: '💊 Health'
+                salud: '💊 Health',
+                // Unidad
+                unidad: 'Unit',
+                libra: 'Pound',
+                kilogramo: 'Kilogram',
+                gramo: 'Gram',
+                litros: 'Liters',
+                mililitros: 'Milliliters',
+                galones: 'Gallons',
+                lata: 'Can',
+                paquete: 'Package',
+                botella: 'Bottle',
             }
         };
 
@@ -5460,6 +5482,43 @@
             // Traducir label Salud
             const labelsalud = document.getElementById('salud');
             if (labelsalud) labelsalud.textContent = trad.salud;
+
+            // Traducir label Unidad
+            const unidad = document.getElementById('unidad');
+            if (unidad) unidad.textContent = trad.unidad;
+
+            // Traducir label Libra
+            const libra = document.getElementById('libra');
+            if (libra) libra.textContent = trad.libra;
+
+            // Traducir label Kilogramo
+            const kilogramo = document.getElementById('kilogramo');
+            if (kilogramo) kilogramo.textContent = trad.kilogramo;
+
+            // Traducir label Gramo
+            const gramo = document.getElementById('gramo');
+            if (gramo) gramo.textContent = trad.gramo;
+
+            // Traducir label Litros
+            const litros = document.getElementById('litros');
+            if (litros) litros.textContent = trad.litros;
+
+            // Traducir label Mililitros
+            const mililitros = document.getElementById('mililitros');
+            if (mililitros) mililitros.textContent = trad.mililitros;
+
+            // Traducir label Galones
+            const galones = document.getElementById('galones');
+            if (galones) galones.textContent = trad.galones;
+
+            // Traducir label Lata
+            const lata = document.getElementById('lata');
+            if (lata) lata.textContent = trad.lata;
+
+            // Traducir label Botella
+            const botella = document.getElementById('botella');
+            if (botella) paquete.textContent = trad.botella;
+
 
 
     
