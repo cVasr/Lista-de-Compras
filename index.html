@@ -2524,13 +2524,13 @@
                     <select class="form-input" id="categoriaProducto">
                         <option value="" id="sinCategoria">Sin categoría</option>
                         <option value="congelados">🧊 Congelados</option>
-                        <option value="bebidas">🫘 Legumbres</option>
-                        <option value="bebidas">🥩 Carnes rojas</option>
-                        <option value="lacteos">🥛 Lácteos</option>
-                        <option value="panaderia">🍞 Panadería</option>
-                        <option value="cereales">🌾 Cereales</option>
-                        <option value="papeleria">📝 Papelería</option>
-                        <option value="salud">💊 Salud</option>
+                        <option value="bebidas" id="legumbres">🫘 Legumbres</option>
+                        <option value="bebidas" id="carnesRojas">🥩 Carnes rojas</option>
+                        <option value="lacteos" id="lacteos">🥛 Lácteos</option>
+                        <option value="panaderia" id="panaderia">🍞 Panadería</option>
+                        <option value="cereales" id="cereales">🌾 Cereales</option>
+                        <option value="papeleria" id="papeleria">📝 Papelería</option>
+                        <option value="salud" id="salud">💊 Salud</option>
                     </select>
                 </div>
 
@@ -2898,7 +2898,15 @@
                 mostrarDecimales: 'Mostrar decimales ($17,000.00)',
                 seleccionarCampos: 'Selecciona qué campos quieres mostrar al agregar artículos',
                 // Categorías
-                sinCategoria: 'Sin categoría'
+                sinCategoria: 'Sin categoría',
+                congelados: 'Congelados',
+                legumbres: 'Legumes',
+                carnesRojas: 'Carnes Rojas',
+                lacteos: 'Lácteos',
+                panaderia: 'Panadería',
+                cereales: 'Cereales',
+                papeleria: 'Papelería',
+                health: 'Salud'
             },
             en: {
                 inicio: 'Home',
@@ -2926,7 +2934,15 @@
                 mostrarDecimales: 'Show decimals ($17,000.00)',
                 seleccionarCampos: 'Select which fields you want to display when adding items',
                 // Categorías
-                sinCategoria: 'Uncategorized'
+                sinCategoria: 'Uncategorized',
+                congelados: 'Frozen foods',
+                legumbres: 'Legumes',
+                carnesRojas: 'Red meats',
+                lacteos: 'Dairy',
+                panaderia: 'Bakery',
+                cereales: 'Cereals',
+                papeleria: 'Stationery',
+                health: 'Health'
             }
         };
 
@@ -5412,6 +5428,41 @@
             // Traducir label Sin categoría
             const labelsinCategoria = document.getElementById('sinCategoria');
             if (labelsinCategoria) labelsinCategoria.textContent = trad.sinCategoria;
+
+            // Traducir label Congelados
+            const labelcongelados = document.getElementById('congelados');
+            if (labelcongelados) labelcongelados.textContent = trad.congelados;
+
+            // Traducir label Legumbres
+            const labellegumbres = document.getElementById('legumbres');
+            if (labellegumbres) labellegumbres.textContent = trad.legumbres;
+
+            // Traducir label Carnes rojas
+            const labelcarnesRojas = document.getElementById('carnesRojas');
+            if (labelcarnesRojas) labelcarnesRojas.textContent = trad.carnesRojas;
+
+            // Traducir label Lácteos
+            const labellacteos = document.getElementById('lacteos');
+            if (labellacteos) labellacteos.textContent = trad.lacteos;
+
+            // Traducir label Panadería
+            const labelpanaderia = document.getElementById('panaderia');
+            if (labelpanaderia) labelpanaderia.textContent = trad.panaderia;
+
+            // Traducir label Cereales
+            const labelcereales = document.getElementById('cereales');
+            if (labelcereales) labelcereales.textContent = trad.cereales;
+
+            // Traducir label Papelería
+            const labelpapeleria = document.getElementById('papeleria');
+            if (labelpapeleria) labelpapeleria.textContent = trad.papeleria;
+
+            // Traducir label Salud
+            const labelsalud = document.getElementById('salud');
+            if (labelsalud) labelsalud.textContent = trad.salud;
+
+
+    
 
             // Traducir botones Cancelar
             document.querySelectorAll('.btn-cancelar').forEach(btn => {
