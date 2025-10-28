@@ -2522,7 +2522,7 @@
                 <div class="form-group" id="campoCategoria" style="display: none;">
                     <label class="form-label">Categoría (opcional)</label>
                     <select class="form-input" id="categoriaProducto">
-                        <option value="">Sin categoría</option>
+                        <option value="" id="sinCategoria">Sin categoría</option>
                         <option value="congelados">🧊 Congelados</option>
                         <option value="bebidas">🫘 Legumbres</option>
                         <option value="bebidas">🥩 Carnes rojas</option>
@@ -2898,7 +2898,7 @@
                 mostrarDecimales: 'Mostrar decimales ($17,000.00)',
                 seleccionarCampos: 'Selecciona qué campos quieres mostrar al agregar artículos',
                 // Categorías
-                sinCategoria: 'Uncategorized'
+                sinCategoria: 'Sin categoría'
             },
             en: {
                 inicio: 'Home',
@@ -2924,7 +2924,7 @@
                 aplicarCambios: 'Apply changes',
                 cancelar: 'Cancel',
                 mostrarDecimales: 'Show decimals ($17,000.00)',
-                seleccionarCampos: 'Select which fields you want to display when adding items'
+                seleccionarCampos: 'Select which fields you want to display when adding items',
                 // Categorías
                 sinCategoria: 'Uncategorized'
             }
@@ -5408,6 +5408,10 @@
             // Traducir label Selecciona qué campos quieres mostrar al agregar artículos
             const labelseleccionarCampos = document.getElementById('seleccionarCampos');
             if (labelseleccionarCampos) labelseleccionarCampos.textContent = trad.seleccionarCampos;
+
+            // Traducir label Sin categoría
+            const labelsinCategoria = document.getElementById('sinCategoria');
+            if (labelsinCategoria) labelsinCategoria.textContent = trad.sinCategoria;
 
             // Traducir botones Cancelar
             document.querySelectorAll('.btn-cancelar').forEach(btn => {
