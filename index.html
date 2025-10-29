@@ -2466,15 +2466,15 @@
         <!-- 5. Resumen en tres columnas -->
         <div class="summary-grid">
             <div class="summary-col">
-                <div class="summary-col-label">Subtotal</div>
+                <div class="summary-col-label" subtotal="subtotal">Subtotal</div>
                 <div class="summary-col-value" id="subtotalDisplay">$0</div>
             </div>
             <div class="summary-col">
-                <div class="summary-col-label">Descuento</div>
+                <div class="summary-col-label" descuentos="descuentos">Descuento</div>
                 <div class="summary-col-value" id="descuentosDisplay">-$0</div>
             </div>
             <div class="summary-col summary-col-total">
-                <div class="summary-col-label">Total</div>
+                <div class="summary-col-label" total="total">Total</div>
                 <div class="summary-col-value" id="totalDisplay">$0</div>
             </div>
         </div>
@@ -2918,6 +2918,11 @@
                 lata: 'Lata',
                 paquete: 'Paquete',
                 botella: 'Botella',
+                // Inicio
+                listaCargada: 'Lista cargada',
+                sinPresuEsta: 'Sin presupuesto establecido',
+                establecerPresu: 'Establecer presupuesto',
+                
             },
             en: {
                 inicio: 'Home',
@@ -5518,6 +5523,18 @@
             // Traducir label Botella
             const botella = document.getElementById('botella');
             if (botella) paquete.textContent = trad.botella;
+
+            // Traducir label Subtotal
+            const subtotal = document.getElementById('subtotal');
+            if (subtotal) subtotal.textContent = trad.subtotal;
+
+            // Traducir label Descuentos
+            const descuentos = document.getElementById('descuentos');
+            if (descuentos) descuentos.textContent = trad.descuentos;
+
+            // Traducir label Total
+            const total = document.getElementById('total');
+            if (total) descuentos.textContent = trad.total;
 
 
 
