@@ -2466,15 +2466,15 @@
         <!-- 5. Resumen en tres columnas -->
         <div class="summary-grid">
             <div class="summary-col">
-                <div class="summary-col-label" subtotal="subtotal">Subtotal</div>
+                <div class="summary-col-label" id="subtotal">Subtotal</div>
                 <div class="summary-col-value" id="subtotalDisplay">$0</div>
             </div>
             <div class="summary-col">
-                <div class="summary-col-label" descuentos="descuentos">Descuento</div>
+                <div class="summary-col-label" id="descuentos">Descuento</div>
                 <div class="summary-col-value" id="descuentosDisplay">-$0</div>
             </div>
             <div class="summary-col summary-col-total">
-                <div class="summary-col-label" total="total">Total</div>
+                <div class="summary-col-label" id="total">Total</div>
                 <div class="summary-col-value" id="totalDisplay">$0</div>
             </div>
         </div>
@@ -2876,9 +2876,9 @@
                 graficos: 'Gráficos',
                 configuracion: 'Configuración',
                 // Elementos fijos en el fondo
-                subtotal: 'Subtotal:',
-                descuentos: 'Descuentos:',
-                total: 'Total:',
+                subtotal: 'Subtotal',
+                descuentos: 'Descuentos',
+                total: 'Total',
                 guardarLista: 'Guardar lista',
                 limpiarTodo: 'Limpiar todo',
                 agregarArticulo: 'Agregar artículo',
